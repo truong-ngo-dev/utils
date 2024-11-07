@@ -3,7 +3,9 @@ package com.nob.utils;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * Utility for date type, all of those class below will be treated as date type:
@@ -123,9 +125,61 @@ public class DateUtils {
     public static boolean isDate(Class<?> clazz) {
         return
                 clazz == LocalDate.class ||
-                        clazz == LocalDateTime.class ||
-                        clazz == ZonedDateTime.class ||
-                        clazz == Instant.class ||
-                        clazz == Date.class;
+                clazz == LocalDateTime.class ||
+                clazz == ZonedDateTime.class ||
+                clazz == Instant.class ||
+                clazz == Date.class;
+    }
+
+    /**
+     * Convert supported type date object to {@code Instant}
+     * @param o the date object
+     * @param zoneId zone id
+     * @return value as {@code Instant}
+     * @throws IllegalArgumentException if date type id not one of supported type date
+     * */
+    public static Instant toInstant(Object o, ZoneId zoneId) {
+        if (Objects.isNull(o)) return null;
+        if (o instanceof Instant) return (Instant) o;
+        if (o instanceof Date) return ((Date) o).toInstant();
+        if (o instanceof LocalDate) return ((LocalDate) o).atStartOfDay(zoneId).toInstant();
+        if (o instanceof LocalDateTime) return ((LocalDateTime) o).atZone(zoneId).toInstant();
+        if (o instanceof ZonedDateTime) return ((ZonedDateTime) o).toInstant();
+        throw new IllegalArgumentException("Unsupported target type: " + o.getClass());
+    }
+
+    /**
+     * Convert supported type date object with UTC zone to {@code Instant}
+     * @param o the date object
+     * @return value as {@code Instant}
+     * @throws IllegalArgumentException if date type id not one of supported type date
+     * */
+    public static Instant toInstantUTC(Object o) {
+        return toInstant(o, ZoneOffset.UTC);
+    }
+
+    /**
+     * Convert supported type date object with system zone to {@code Instant}
+     * @param o the date object
+     * @return value as {@code Instant}
+     * @throws IllegalArgumentException if date type id not one of supported type date
+     * */
+    public static Instant toInstantSystem(Object o) {
+        return toInstant(o, ZoneId.systemDefault());
+    }
+
+    /**
+     * Compare to date object
+     * @param v1 left-hand side date object
+     * @param v2 right-hand side date object
+     * @return compare result
+     * */
+    @SuppressWarnings("all")
+    public static int compare(Object v1, Object v2) {
+        Objects.requireNonNull(v1);
+        Objects.requireNonNull(v2);
+        Instant date1 = toInstant(v1, ZoneId.systemDefault());
+        Instant date2 = toInstant(v2, ZoneId.systemDefault());
+        return date1.compareTo(date2);
     }
 }
