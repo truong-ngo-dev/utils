@@ -116,7 +116,7 @@ public class DateUtils {
     }
 
     /**
-     * Check if given type is Date type
+     * Check if given type is one of supported date type
      * @param clazz given type
      * @return true if type is Date
      * */
