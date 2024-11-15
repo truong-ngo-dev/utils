@@ -25,8 +25,8 @@ public class ClassUtils {
      *
      * @param packageName The base package
      * @return The classes
-     * @throws ClassNotFoundException
-     * @throws IOException
+     * @throws ClassNotFoundException invalid package name
+     * @throws IOException read file error
      */
     public static List<Class<?>> scanPackage(String packageName) throws IOException, ClassNotFoundException {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -45,13 +45,15 @@ public class ClassUtils {
         return new ArrayList<>(classes);
     }
 
+
     /**
+     * Utility method of {@link #scanPackage(String)} <p>
      * Recursive method used to find all classes in a given directory and sub-dirs.
      *
      * @param directory   The base directory
      * @param packageName The package name for classes found inside the base directory
      * @return The classes
-     * @throws ClassNotFoundException
+     * @throws ClassNotFoundException if package name is invalid
      */
     private static List<Class<?>> findClasses(File directory, String packageName) throws ClassNotFoundException {
         List<Class<?>> classes = new ArrayList<>();
