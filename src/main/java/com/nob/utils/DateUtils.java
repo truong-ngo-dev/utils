@@ -101,19 +101,12 @@ public class DateUtils {
      * */
     public static <T> T parseDate(Long timestamp, Class<T> targetType) {
         Instant instant = Instant.ofEpochMilli(timestamp);
-        if (targetType == Date.class) {
-            return targetType.cast(Date.from(instant));
-        } else if (targetType == Instant.class) {
-            return targetType.cast(instant);
-        } else if (targetType == LocalDate.class) {
-            return targetType.cast(instant.atZone(ZoneId.systemDefault()).toLocalDate());
-        } else if (targetType == LocalDateTime.class) {
-            return targetType.cast(instant.atZone(ZoneId.systemDefault()).toLocalDateTime());
-        } else if (targetType == ZonedDateTime.class) {
-            return targetType.cast(instant.atZone(ZoneId.systemDefault()));
-        } else {
-            throw new IllegalArgumentException("Unsupported target type: " + targetType);
-        }
+        if (targetType == Date.class) return targetType.cast(Date.from(instant));
+        if (targetType == Instant.class) return targetType.cast(instant);
+        if (targetType == LocalDate.class) return targetType.cast(instant.atZone(ZoneId.systemDefault()).toLocalDate());
+        if (targetType == LocalDateTime.class) return targetType.cast(instant.atZone(ZoneId.systemDefault()).toLocalDateTime());
+        if (targetType == ZonedDateTime.class) return targetType.cast(instant.atZone(ZoneId.systemDefault()));
+        throw new IllegalArgumentException("Unsupported target type: " + targetType);
     }
 
     /**

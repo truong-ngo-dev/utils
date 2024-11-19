@@ -1,15 +1,25 @@
 package com.nob.utils;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Class utility
  * */
+@Slf4j
 public class ClassUtils {
 
     /**
@@ -71,5 +81,58 @@ public class ClassUtils {
             }
         }
         return classes;
+    }
+
+
+    /**
+     * Load all json file of specific resource folder into object type {@code T}
+     * @param classPath directory from root classpath
+     * @param clazz class type of {@code T}
+     * @param <T> object type T
+     * @return List of object type {@code T}
+     * */
+    public static <T> List<T> loadJson(String classPath, Class<T> clazz) {
+        return loadJsonInternal(classPath, clazz, null);
+    }
+
+
+    /**
+     * Load all json file of specific resource folder into generic parameterize object type {@code T}
+     * @param classPath directory from root classpath
+     * @param type generic parameterize object type of {@code T}
+     * @param <T> object type T
+     * @return List of object type {@code T}
+     * */
+    public static <T> List<T> loadJson(String classPath, TypeReference<T> type) {
+        return loadJsonInternal(classPath, null, type);
+    }
+
+
+    /**
+     * Helper method for load json file into object
+     * @param <T> type of object
+     * @param clazz class type of object
+     * @param type parameterize type of object
+     * @return List of object type {@code T}
+     * @see #loadJson(String, Class)
+     * @see #loadJson(String, TypeReference)
+     * */
+    private static <T> List<T> loadJsonInternal(String classPath, Class<T> clazz, TypeReference<T> type) {
+        List<T> result = new ArrayList<>();
+        try {
+            String path = classPath.replace('.', '/') + "/*.json";
+            PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+            Resource[] resources = resolver.getResources(path);
+            for (Resource r : resources) {
+                String json = new String(Files.readAllBytes(Paths.get(r.getURI())));
+                T o = Objects.nonNull(clazz) ?
+                        JsonUtils.fromJson(json, clazz) :
+                        JsonUtils.fromJson(json, type);
+                result.add(o);
+            }
+        } catch (IOException e) {
+            log.error("Error occur!: {}", e.getMessage(), e);
+        }
+        return result;
     }
 }
