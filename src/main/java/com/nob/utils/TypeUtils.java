@@ -18,6 +18,36 @@ import java.util.*;
 public class TypeUtils {
 
     /**
+     * Wrapper type collections
+     * */
+    private static final List<Class<?>> WRAPPER_TYPES = List.of(
+            Boolean.class, Character.class, Byte.class,
+            Short.class, Integer.class, Long.class,
+            Float.class, Double.class, Void.class
+    );
+
+
+    /**
+     * Check if object is Wrapper type
+     * @param clazz checked class
+     * @return true if class is Wrapper type
+     * */
+    public static boolean isWrapper(Class<?> clazz) {
+        return WRAPPER_TYPES.contains(clazz);
+    }
+
+
+    /**
+     * Check if object is primitive type
+     * @param clazz checked class
+     * @return true if class is primitive
+     * */
+    public static boolean isPrimitive(Class<?> clazz) {
+        return clazz.isPrimitive();
+    }
+
+
+    /**
      * Check if given type is number or not
      * @param clazz type
      * @return true if type is number
