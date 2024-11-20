@@ -109,19 +109,6 @@ public class DateUtils {
         throw new IllegalArgumentException("Unsupported target type: " + targetType);
     }
 
-    /**
-     * Check if given type is one of supported date type
-     * @param clazz given type
-     * @return true if type is Date
-     * */
-    public static boolean isDate(Class<?> clazz) {
-        return
-                clazz == LocalDate.class ||
-                clazz == LocalDateTime.class ||
-                clazz == ZonedDateTime.class ||
-                clazz == Instant.class ||
-                clazz == Date.class;
-    }
 
     /**
      * Convert supported type date object to {@code Instant}
