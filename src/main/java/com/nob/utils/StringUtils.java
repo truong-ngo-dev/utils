@@ -46,4 +46,22 @@ public class StringUtils {
         if (isTrimEmpty(s)) return Collections.emptyList();
         return Stream.of(s.split(delimiter)).map(mapper).collect(Collectors.toList());
     }
+
+
+    /**
+     * Get the non-empty value of string, if the input string is empty return value is null
+     * @param s the string
+     * */
+    public static String nonEmptyValue(String s) {
+        return isTrimEmpty(s) ? null : s;
+    }
+
+
+    /**
+     * Get the non-null string value
+     * @param s the string
+     * */
+    public static String nvl(String s) {
+        return isTrimEmpty(s) ? "" : s;
+    }
 }
