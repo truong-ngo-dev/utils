@@ -1,5 +1,7 @@
 package com.nob.utils;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -50,6 +52,34 @@ public class TypeUtils {
      * */
     private static boolean isWrapperNumber(Class<?> clazz) {
         return Number.class.isAssignableFrom(clazz);
+    }
+
+
+    /**
+     * Check if given type is integer
+     * @param clazz type
+     * @return true if type is integer
+     * */
+    public static boolean isInteger(Class<?> clazz) {
+        return
+                clazz == int.class || clazz == Integer.class ||
+                clazz == long.class || clazz == Long.class ||
+                clazz == short.class || clazz == Short.class ||
+                clazz == byte.class || clazz == Byte.class ||
+                clazz == BigInteger.class;
+    }
+
+
+    /**
+     * Check if given type is decimal
+     * @param clazz type
+     * @return true if type is decimal
+     * */
+    public static boolean isDecimal(Class<?> clazz) {
+        return
+                clazz == float.class || clazz == Float.class ||
+                clazz == double.class || clazz == Double.class ||
+                clazz == BigDecimal.class;
     }
 
 
