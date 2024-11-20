@@ -1,5 +1,6 @@
 package com.nob.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -109,7 +110,7 @@ public class ClassUtils {
 
 
     /**
-     * Helper method for load json file into object
+     * Helper method for load json file into object. If the base directory not exist or some file is not valid ignored
      * @param <T> type of object
      * @param clazz class type of object
      * @param type parameterize type of object
@@ -131,7 +132,7 @@ public class ClassUtils {
                 result.add(o);
             }
         } catch (IOException e) {
-            log.error("Error occur!: {}", e.getMessage());
+            log.warn("Error occur while loading the json file on resource folder!");
         }
         return result;
     }
