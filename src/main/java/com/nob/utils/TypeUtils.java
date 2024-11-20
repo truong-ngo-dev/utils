@@ -11,6 +11,10 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.*;
 
+/**
+ * Utility for type
+ * @author Truong Ngo
+ * */
 public class TypeUtils {
 
     /**
