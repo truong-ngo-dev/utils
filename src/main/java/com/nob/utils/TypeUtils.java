@@ -2,7 +2,6 @@ package com.nob.utils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Instant;
@@ -11,7 +10,6 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 public class TypeUtils {
