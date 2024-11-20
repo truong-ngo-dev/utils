@@ -39,4 +39,15 @@ public class JsonUtils {
     public static <T> T fromJson(String json, TypeReference<T> type) throws JsonProcessingException {
         return Objects.isNull(json) ? null : MAPPER.readValue(json, type);
     }
+
+
+    /**
+     * Serialize object to json string
+     * @param obj object
+     * @return serialize json string
+     * @throws JsonProcessingException if error occur when process json serialization
+     * */
+    public static String toJson(Object obj) throws JsonProcessingException {
+        return MAPPER.writeValueAsString(obj);
+    }
 }
