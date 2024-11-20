@@ -1,5 +1,6 @@
 package com.nob.utils;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.math.BigDecimal;
@@ -8,9 +9,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 
 public class TypeUtils {
 
@@ -177,5 +176,27 @@ public class TypeUtils {
             ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
             return  (Class<?>) parameterizedType.getActualTypeArguments()[0];
         }
+    }
+
+
+    /**
+     * Get collection value of object
+     * @param o object
+     * @return Collection type object
+     * @throws IllegalArgumentException if object is not a collection type
+     * */
+    public static Collection<?> getCollection(Object o) {
+        if (Objects.isNull(o)) return null;
+        if (o.getClass().isArray()) {
+            List<Object> rs = new ArrayList<>();
+            for (int i = 0; i < Array.getLength(o); i++) {
+                rs.add(Array.get(o, i));
+            }
+            return rs;
+        }
+        if (Collection.class.isAssignableFrom(o.getClass())) {
+            return (Collection<?>) o;
+        }
+        throw new IllegalArgumentException(o.getClass() + " is not a collection");
     }
 }
