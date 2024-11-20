@@ -1,5 +1,8 @@
 package com.nob.utils;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Instant;
@@ -8,6 +11,8 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public class TypeUtils {
 
@@ -145,5 +150,34 @@ public class TypeUtils {
      * */
     public static boolean isCollection(Class<?> clazz) {
         return clazz.isArray() || Collection.class.isAssignableFrom(clazz);
+    }
+
+
+    /**
+     * Check if type is map
+     * @param clazz type
+     * @return true if type is map
+     * */
+    public static boolean isMap(Class<?> clazz) {
+        return Map.class.isAssignableFrom(clazz);
+    }
+
+
+    /**
+     * Get the element java type of collection, apply for object as other object property <p>
+     * Don't use for {@code java.util.List<Object>}, {@code java.util.List<?>}, {@code Object[]}
+     * @param clazz object type
+     * @param field reflection field represent object
+     * @return java type of element
+     * @throws IllegalArgumentException if object is not a collection type
+     * */
+    public static Class<?> getElementType(Class<?> clazz, Field field) {
+        if (clazz.isArray()) {
+            return clazz.getComponentType();
+        } else {
+            field.setAccessible(true);
+            ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
+            return  (Class<?>) parameterizedType.getActualTypeArguments()[0];
+        }
     }
 }
