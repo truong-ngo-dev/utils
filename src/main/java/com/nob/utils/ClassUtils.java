@@ -6,6 +6,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -130,7 +131,7 @@ public class ClassUtils {
                 result.add(o);
             }
         } catch (IOException e) {
-            log.error("Error occur!: {}", e.getMessage(), e);
+            log.error("Error occur!: {}", e.getMessage());
         }
         return result;
     }
