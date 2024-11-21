@@ -1,8 +1,7 @@
 package com.nob.utils;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Instant;
@@ -208,8 +207,37 @@ public class TypeUtils {
         } else {
             field.setAccessible(true);
             ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
-            return  (Class<?>) parameterizedType.getActualTypeArguments()[0];
+            return (Class<?>) parameterizedType.getActualTypeArguments()[0];
         }
+    }
+
+
+    /**
+     * Get the element type of collection parameter of method which is annotated by A
+     * @param method the method
+     * @param annotationClass annotation Class object
+     * @param <A> annotation type
+     * @return the generic type of collection parameter of method which is annotated by A
+     * */
+    public static <A extends Annotation> Class<?> getParameterGenericElementType(Method method, Class<A> annotationClass) {
+        Parameter parameter = null;
+        Parameter[] parameters = method.getParameters();
+        for (Parameter p : parameters) {
+            if (p.isAnnotationPresent(annotationClass)) {
+                parameter = p;
+            }
+        }
+
+        if (Objects.nonNull(parameter)) {
+            if (parameter.getType().isArray()) {
+                return parameter.getType().getComponentType();
+            }
+            if (Collection.class.isAssignableFrom(parameter.getType())) {
+                ParameterizedType parameterizedType = (ParameterizedType) parameter.getParameterizedType();
+                return (Class<?>) parameterizedType.getActualTypeArguments()[0];
+            }
+        }
+        return null;
     }
 
 
