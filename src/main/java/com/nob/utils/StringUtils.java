@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -14,6 +15,9 @@ import java.util.stream.Stream;
 public class StringUtils {
 
     public static final String EMAIL_REGEX = "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?";
+
+    public static final String ALPHANUMERIC_REGEX = "[a-zA-Z0-9]+";
+
 
     /**
      * Check if given string is empty or not after trim()
@@ -74,6 +78,16 @@ public class StringUtils {
      * @return true if string is email
      * */
     public static boolean isEmail(String s) {
-        return s.matches(EMAIL_REGEX);
+        return Pattern.compile(EMAIL_REGEX, Pattern.CASE_INSENSITIVE).matcher(s).matches();
+    }
+
+
+    /**
+     * Check if given string is alphanumeric
+     * @param s given string
+     * @return true if string is alphanumeric
+     * */
+    public static boolean isAlphanumeric(String s) {
+        return s.matches(ALPHANUMERIC_REGEX);
     }
 }
