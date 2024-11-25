@@ -18,6 +18,8 @@ public class StringUtils {
 
     public static final String ALPHANUMERIC_REGEX = "[a-zA-Z0-9]+";
 
+    public static final String URL_REGEX_PREFIX = "^(?i)(%s):\\/\\/[\\w\\-]+(\\.[\\w\\-]+)+[/#?]?.*$";
+
 
     /**
      * Check if given string is empty or not after trim()
@@ -89,5 +91,18 @@ public class StringUtils {
      * */
     public static boolean isAlphanumeric(String s) {
         return s.matches(ALPHANUMERIC_REGEX);
+    }
+
+
+    /**
+     * Check if given string is url
+     * @param s given string
+     * @param schemes allow schemes (http, https, ftp...)
+     * @return true if string is url base on allow schemes
+     **/
+    public static boolean isUrl(String s, List<String> schemes) {
+        String scheme = String.join("|", schemes);
+        String regex = String.format(URL_REGEX_PREFIX, scheme);
+        return s.matches(regex);
     }
 }
