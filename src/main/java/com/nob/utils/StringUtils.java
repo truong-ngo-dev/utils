@@ -13,6 +13,8 @@ import java.util.stream.Stream;
  * */
 public class StringUtils {
 
+    public static final String EMAIL_REGEX = "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?";
+
     /**
      * Check if given string is empty or not after trim()
      * @param s the string
@@ -63,5 +65,15 @@ public class StringUtils {
      * */
     public static String nvl(String s) {
         return isTrimEmpty(s) ? "" : s;
+    }
+
+
+    /**
+     * Check if given string is email
+     * @param s given string
+     * @return true if string is email
+     * */
+    public static boolean isEmail(String s) {
+        return s.matches(EMAIL_REGEX);
     }
 }
