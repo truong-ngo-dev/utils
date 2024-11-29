@@ -7,6 +7,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * Class utility
@@ -133,5 +135,23 @@ public class ClassUtils {
             log.warn("Error occur while loading the json file on resource folder!");
         }
         return result;
+    }
+
+
+    /**
+     * Find the getter base on field name
+     * @param fieldName object field name
+     * @return {@code Function} act as object getter
+     * */
+    public static Function<Object, Object> fieldGetter(String fieldName) {
+        return o -> {
+            try {
+                Field field = o.getClass().getDeclaredField(fieldName);
+                field.setAccessible(true);
+                return field.get(o);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                return null;
+            }
+        };
     }
 }
