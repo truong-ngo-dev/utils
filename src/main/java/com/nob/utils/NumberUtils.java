@@ -1,6 +1,7 @@
 package com.nob.utils;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -42,7 +43,7 @@ public class NumberUtils {
      * @param s string to check
      * @return true if string is represent decimal number otherwise false
      * */
-    public boolean isDecimalNumber(String s) {
+    public static boolean isDecimalNumber(String s) {
         return Objects.nonNull(s) && s.matches(DECIMAL_NUMBER_REGEX);
     }
 
@@ -52,7 +53,7 @@ public class NumberUtils {
      * @param converter converter of {@code String} to {@code T} type
      * @return true if the string is convertable to T type, otherwise false
      * */
-    public <T extends Number> boolean isNumberOf(String s, Function<String, T> converter) {
+    public static  <T extends Number> boolean isNumberOf(String s, Function<String, T> converter) {
         if (!isDecimalNumber(s)) {
             return false;
         }
@@ -69,7 +70,7 @@ public class NumberUtils {
      * @param s string to check
      * @return true if the string is convertable to {@code Integer}, otherwise false
      * */
-    public boolean isInteger(String s) {
+    public static boolean isInteger(String s) {
         return isNumberOf(s, INTEGER_CONVERTER);
     }
 
@@ -78,7 +79,7 @@ public class NumberUtils {
      * @param s string to check
      * @return true if the string is convertable to {@code Long}, otherwise false
      * */
-    public boolean isLong(String s) {
+    public static boolean isLong(String s) {
         return isNumberOf(s, LONG_CONVERTER);
     }
 
@@ -87,7 +88,7 @@ public class NumberUtils {
      * @param s string to check
      * @return true if the string is convertable to {@code Float}, otherwise false
      * */
-    public boolean isFloat(String s) {
+    public static boolean isFloat(String s) {
         return isNumberOf(s, FLOAT_CONVERTER);
     }
 
@@ -96,7 +97,7 @@ public class NumberUtils {
      * @param s string to check
      * @return true if the string is convertable to {@code Double}, otherwise false
      * */
-    public boolean isDouble(String s) {
+    public static boolean isDouble(String s) {
         return isNumberOf(s, DOUBLE_CONVERTER);
     }
 
@@ -236,5 +237,18 @@ public class NumberUtils {
         BigDecimal ld = new BigDecimal(lhs.toString());
         BigDecimal rd = new BigDecimal(rhs.toString());
         return ld.compareTo(rd);
+    }
+
+    public static Number toNumber(Class<? extends Number> numberType, String s) {
+        if (Objects.isNull(numberType)) return null;
+        if (numberType == Byte.class) return Byte.valueOf(s);
+        if (numberType == Short.class) return Short.valueOf(s);
+        if (numberType == Integer.class) return Integer.valueOf(s);
+        if (numberType == Long.class) return Integer.valueOf(s);
+        if (numberType == BigInteger.class) return new BigInteger(s);
+        if (numberType == Float.class) return Float.valueOf(s);
+        if (numberType == Double.class) return Double.valueOf(s);
+        if (numberType == BigDecimal.class) return new BigDecimal(s);
+        throw new IllegalArgumentException("Cannot convert " + s + " to " + numberType);
     }
 }
