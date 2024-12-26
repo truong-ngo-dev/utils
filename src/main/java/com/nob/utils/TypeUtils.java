@@ -1,5 +1,7 @@
 package com.nob.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.math.BigDecimal;
@@ -270,13 +272,11 @@ public class TypeUtils {
         if (isString(clazz)) return value;
         if (isBoolean(clazz)) return Boolean.valueOf(value);
         if (isEnum(clazz)) return Enum.valueOf((Class<Enum>) clazz, value);
-        if (isDate(clazz)) {
-            if (clazz == LocalDate.class) return LocalDate.parse(value);
-            if (clazz == LocalDateTime.class) return LocalDateTime.parse(value);
-            if (clazz == ZonedDateTime.class) return ZonedDateTime.parse(value);
-            if (clazz == Instant.class) return Instant.parse(value);
-            if (clazz == Date.class) return Date.from(Instant.parse(value));
+        if (isDate(clazz)) return DateUtils.parseDateWithSystemZone(value, clazz);
+        try {
+            return JsonUtils.fromJson(value, clazz);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException("Unsupported type: " + clazz);
         }
-        throw new IllegalArgumentException("Unsupported type: " + clazz);
     }
 }
