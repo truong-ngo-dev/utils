@@ -239,7 +239,7 @@ public class NumberUtils {
         return ld.compareTo(rd);
     }
 
-    public static Number toNumber(Class<? extends Number> numberType, String s) {
+    public static Number toNumber(Class<?> numberType, String s) {
         if (Objects.isNull(numberType)) return null;
         if (numberType == Byte.class) return Byte.valueOf(s);
         if (numberType == Short.class) return Short.valueOf(s);

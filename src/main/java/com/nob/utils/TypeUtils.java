@@ -261,4 +261,22 @@ public class TypeUtils {
         }
         throw new IllegalArgumentException(o.getClass() + " is not a collection");
     }
+
+
+    @SuppressWarnings("all")
+    public static Object castValueAs(String value, Class<?> clazz) {
+        if (Objects.isNull(value)) return null;
+        if (isNumber(clazz)) return NumberUtils.toNumber(clazz, value);
+        if (isString(clazz)) return value;
+        if (isBoolean(clazz)) return Boolean.valueOf(value);
+        if (isEnum(clazz)) return Enum.valueOf((Class<Enum>) clazz, value);
+        if (isDate(clazz)) {
+            if (clazz == LocalDate.class) return LocalDate.parse(value);
+            if (clazz == LocalDateTime.class) return LocalDateTime.parse(value);
+            if (clazz == ZonedDateTime.class) return ZonedDateTime.parse(value);
+            if (clazz == Instant.class) return Instant.parse(value);
+            if (clazz == Date.class) return Date.from(Instant.parse(value));
+        }
+        throw new IllegalArgumentException("Unsupported type: " + clazz);
+    }
 }
