@@ -341,7 +341,6 @@ public class HttpUtils {
      *         <li>{@code encoding}: The encoding of the file (if available).</li>
      *         <li>{@code contentDisposition}: The content disposition header (e.g., "inline", "attachment").</li>
      *         <li>{@code extension}: The file extension (e.g., "jpg", "pdf").</li>
-     *         <li>{@code originalFileName}: The original submitted file name (same as "fileName" in this case).</li>
      *         </ul>
      */
     public static Map<String, Object> getPartMetadata(Part part) {
