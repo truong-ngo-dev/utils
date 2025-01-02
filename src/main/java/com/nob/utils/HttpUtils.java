@@ -1,12 +1,21 @@
 package com.nob.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.HandlerMapping;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+@Slf4j
 public class HttpUtils {
 
     /**
@@ -35,6 +44,53 @@ public class HttpUtils {
             }
         }
         return result;
+    }
+
+
+    /**
+     * Reads the request body from an {@link HttpServletRequest}.
+     * <p>
+     * This method reads the body content of an HTTP request and returns it as a {@link String}.
+     * It is typically used for processing POST or PUT requests where the body contains data, such as JSON or form data.
+     * </p>
+     *
+     * @param request The {@link HttpServletRequest} object from which to read the request body.
+     * @return A {@link String} containing the entire body of the HTTP request.
+     * @throws IllegalStateException If an I/O error occurs while reading the request body.
+     */
+    public static String parseRequestBody(HttpServletRequest request) {
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader reader = request.getReader()) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+        } catch (IOException e) {
+            log.error("Cannot read request body: {}", e.getMessage());
+            throw new IllegalStateException("Cannot read request body: " + e.getMessage());
+        }
+        return sb.toString();
+    }
+
+
+    /**
+     * Parses a JSON string into a generic {@link Object}.
+     * <p>
+     * This method takes a JSON-formatted {@link String} and converts it into a generic object representation.
+     * The resulting object could be a {@link Map}, {@link List}, or any other type, depending on the JSON content.
+     * </p>
+     *
+     * @param body The JSON string to parse.
+     * @return An {@link Object} representing the deserialized JSON content.
+     * @throws IllegalStateException If the JSON cannot be deserialized due to invalid syntax or other errors.
+     */
+    public static Object parseJsonBody(String body) {
+        try {
+            return new ObjectMapper().readValue(body, Object.class);
+        } catch (IOException e) {
+            log.error("Cannot deserialize JSON request body: {}", e.getMessage());
+            throw new IllegalStateException("Cannot deserialize JSON request body: " + e.getMessage());
+        }
     }
 
 
@@ -82,5 +138,130 @@ public class HttpUtils {
     @SuppressWarnings("unchecked")
     public static Map<String, String> getPathVariables(HttpServletRequest request) {
         return (Map<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+    }
+
+
+    /**
+     * Retrieves the request parameters from an HTTP request as a map of parameter names to their values.
+     * <p>
+     * This method parses the query string from the given {@link HttpServletRequest} and returns a map
+     * where each parameter name is associated with a list of its values.
+     * </p>
+     *
+     * @param request The {@link HttpServletRequest} from which to retrieve the request parameters.
+     *                This object contains the query string to be parsed.
+     * @return A map where the keys are parameter names and the values are lists of strings representing
+     *         the values associated with each parameter. If a parameter has multiple values, all values
+     *         are included in the list. If no query string is present or parameters are not found, the
+     *         map will be empty.
+     */
+    public static Map<String, List<String>> getQueryParameters(HttpServletRequest request) {
+        return parseQueryString(request.getQueryString());
+    }
+
+
+    /**
+     * Retrieves the parts of a multipart HTTP request.
+     * <p>
+     * This method is used to extract parts (e.g., files or form fields) from a multipart request
+     * as a collection of {@link Part} objects. It relies on the {@link HttpServletRequest#getParts()}
+     * method and handles exceptions that may occur during processing.
+     * </p>
+     *
+     * @param request The {@link HttpServletRequest} containing the multipart data.
+     * @return A collection of {@link Part} objects representing the parts of the request, or {@code null}
+     *         if an error occurs during processing.
+     */
+    public static Collection<Part> getRequestParts(HttpServletRequest request) {
+        try {
+            return request.getParts();
+        } catch (ServletException | IOException e) {
+            log.error("Can not parse request parts: {}", e.getMessage());
+            return null;
+        }
+    }
+
+
+    /**
+     * Extracts and parses the body of an HTTP request based on its content type.
+     * <p>
+     * This method inspects the content-type of an {@link HttpServletRequest} to determine how to handle
+     * and parse the request body. It supports:
+     * <ul>
+     *   <li><code>multipart/form-data</code>: Returns the request parts.</li>
+     *   <li><code>application/x-www-form-urlencoded</code>: Parses the body as a query string and returns a {@link Map} of parameters.</li>
+     *   <li>JSON: Parses the body into a generic {@link Object}.</li>
+     * </ul>
+     * If the body is empty or the content type is unsupported, the method returns <code>null</code>.
+     * </p>
+     *
+     * @param request The {@link HttpServletRequest} object from which to extract the body.
+     * @return An {@link Object} representing the parsed request body. This could be:
+     *         <ul>
+     *           <li>A {@link Collection} of {@link Part} objects for multipart requests.</li>
+     *           <li>A {@link Map} for form-encoded requests.</li>
+     *           <li>A deserialized JSON object for JSON requests.</li>
+     *           <li><code>null</code> if the body is empty or unsupported.</li>
+     *         </ul>
+     * @throws IllegalStateException If an error occurs while reading the request body or parsing it.
+     * @see HttpServletRequest#getContentType()
+     * @see #parseRequestBody(HttpServletRequest)
+     * @see #parseQueryString(String)
+     * @see #parseJsonBody(String)
+     * @see #getRequestParts(HttpServletRequest)
+     */
+    public static Object getRequestBody(HttpServletRequest request) {
+        String contentType = request.getContentType();
+        if (Objects.nonNull(contentType) && contentType.contains("multipart/form-data")) {
+            return getRequestParts(request);
+        }
+        String body = parseRequestBody(request);
+        if (body.trim().isEmpty()) {
+            return null;
+        }
+        if (Objects.nonNull(contentType) && contentType.contains("application/x-www-form-urlencoded")) {
+            return parseQueryString(body);
+        }
+        return parseJsonBody(body);
+    }
+
+
+    /**
+     * Retrieves all cookies from the HTTP request.
+     *
+     * @param request The {@link HttpServletRequest} from which to retrieve cookies.
+     * @return A {@link Map} where the keys are cookie names and the values are cookie values.
+     *         Returns an empty map if no cookies are present.
+     */
+    public static Map<String, String> getAllCookies(HttpServletRequest request) {
+        Map<String, String> cookiesMap = new LinkedHashMap<>();
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                cookiesMap.put(cookie.getName(), cookie.getValue());
+            }
+        }
+        return cookiesMap;
+    }
+
+
+    /**
+     * Retrieves all session attributes from the HTTP request.
+     *
+     * @param request The {@link HttpServletRequest} from which to retrieve session attributes.
+     * @return A {@link Map} where the keys are attribute names and the values are attribute values.
+     *         Returns an empty map if the session does not exist or has no attributes.
+     */
+    public static Map<String, Object> getAllSessionAttributes(HttpServletRequest request) {
+        Map<String, Object> sessionAttributes = new LinkedHashMap<>();
+        HttpSession session = request.getSession(false); // Retrieve the session, do not create if not present
+        if (session != null) {
+            Enumeration<String> attributeNames = session.getAttributeNames();
+            while (attributeNames.hasMoreElements()) {
+                String attributeName = attributeNames.nextElement();
+                sessionAttributes.put(attributeName, session.getAttribute(attributeName));
+            }
+        }
+        return sessionAttributes;
     }
 }
