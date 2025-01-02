@@ -12,7 +12,7 @@ public class ReflectionUtils {
      *
      * @param clazz     The class to start searching from.
      * @param fieldName The name of the field to retrieve.
-     * @return An {@link Optional} containing the Field, or an empty Optional if the field is not found.
+     * @return an {@link Optional} containing the Field, or an empty Optional if the field is not found.
      * @throws IllegalArgumentException if clazz or fieldName is null.
      */
     public static Optional<Field> getField(Class<?> clazz, String fieldName) {
@@ -36,7 +36,7 @@ public class ReflectionUtils {
      *
      * @param obj       The object to retrieve the field value from.
      * @param fieldName The name of the field.
-     * @return An {@link Optional} containing the value of the field, or an empty Optional if the field is not found or inaccessible.
+     * @return an {@link Optional} containing the value of the field, or an empty Optional if the field is not found or inaccessible.
      * @throws IllegalArgumentException if obj or fieldName is null.
      * @throws IllegalStateException if field is not accessible
      */
