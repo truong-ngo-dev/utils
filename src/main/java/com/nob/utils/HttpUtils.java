@@ -362,7 +362,6 @@ public class HttpUtils {
             metadata.put("encoding", part.getHeader("Content-Transfer-Encoding"));
             metadata.put("contentDisposition", part.getHeader("Content-Disposition"));
             metadata.put("extension", getFileExtension(part.getSubmittedFileName()));
-            metadata.put("originalFileName", part.getSubmittedFileName());
         }
         return metadata;
     }
