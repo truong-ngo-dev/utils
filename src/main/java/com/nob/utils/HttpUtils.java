@@ -349,7 +349,7 @@ public class HttpUtils {
         metadata.put("contentType", part.getContentType());
         metadata.put("headers", part.getHeaderNames().stream().collect(Collectors.toMap(h -> h, part::getHeader)));
         metadata.put("name", part.getName());
-        if (Objects.nonNull(part.getContentType()) && part.getContentType().startsWith("text/")) {
+        if (Objects.isNull(part.getSubmittedFileName())) {
             try (InputStream is = part.getInputStream()) {
                 metadata.put("value", new String(is.readAllBytes(), StandardCharsets.UTF_8));
             } catch (IOException e) {
