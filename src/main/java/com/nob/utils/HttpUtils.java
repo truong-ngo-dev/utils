@@ -11,9 +11,11 @@ import org.springframework.web.servlet.HandlerMapping;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class HttpUtils {
@@ -183,6 +185,23 @@ public class HttpUtils {
 
 
     /**
+     * Retrieves metadata for all request parts (file or form data) from a multipart HTTP request.
+     * This method processes each part of the request, extracts the metadata (such as file name, size, content type),
+     * and returns a list of maps containing the metadata for each part.
+     * @param request The HttpServletRequest object containing the multipart data.
+     * @return A list of maps where each map contains metadata about a request part.
+     *         If there are 2no parts or the parts are null, an empty list is returned.
+     * @see #getPartMetadata(Part)
+     * @see #getRequestParts(HttpServletRequest)
+     */
+    public static List<Map<String, Object>> getSerializableRequestParts(HttpServletRequest request) {
+        Collection<Part> parts = getRequestParts(request);
+        if (Objects.isNull(parts) || parts.isEmpty()) return Collections.emptyList();
+        return parts.stream().map(HttpUtils::getPartMetadata).collect(Collectors.toList());
+    }
+
+
+    /**
      * Extracts and parses the body of an HTTP request based on its content type.
      * <p>
      * This method inspects the content-type of an {@link HttpServletRequest} to determine how to handle
@@ -263,5 +282,68 @@ public class HttpUtils {
             }
         }
         return sessionAttributes;
+    }
+
+
+    /**
+     * Retrieves metadata information from a file part.
+     * This method extracts common file metadata such as file name, size, content type,
+     * encoding, content disposition, file extension, and the original file name.
+     * <p>
+     * The metadata is returned as a map, where the key is the metadata field name and the value
+     * is the corresponding metadata value.
+     *
+     * @param part The Part object representing the uploaded file in a multipart request.
+     * @return A Map containing metadata about the uploaded file part.
+     *         The map keys and their corresponding values are:
+     *         <ul>
+     *         <li><strong>"fileName"</strong> : The submitted file name (e.g., "image.jpg").</li>
+     *         <li><strong>"size"</strong> : The size of the uploaded file in bytes (e.g., 1024).</li>
+     *         <li><strong>"contentType"</strong> : The MIME type of the file (e.g., "image/jpeg", "application/pdf").</li>
+     *         <li><strong>"encoding"</strong> : The encoding of the file (if available).</li>
+     *         <li><strong>"contentDisposition"</strong> : The content disposition header (e.g., "inline", "attachment").</li>
+     *         <li><strong>"extension"</strong> : The file extension (e.g., "jpg", "pdf").</li>
+     *         <li><strong>"originalFileName"</strong> : The original submitted file name (same as "fileName" in this case).</li>
+     *         </ul>
+     */
+    public static Map<String, Object> getPartMetadata(Part part) {
+        Map<String, Object> metadata = new LinkedHashMap<>();
+        metadata.put("contentType", part.getContentType());
+        metadata.put("headers", part.getHeaderNames().stream().collect(Collectors.toMap(h -> h, part::getHeader)));
+        metadata.put("name", part.getName());
+        if (Objects.nonNull(part.getContentType()) && part.getContentType().startsWith("text/")) {
+            try (InputStream is = part.getInputStream()) {
+                metadata.put("value", new String(is.readAllBytes(), StandardCharsets.UTF_8));
+            } catch (IOException e) {
+                log.error("Can not read part: {}", e.getMessage());
+                throw new IllegalStateException("Can not read part: " + e.getMessage());
+            }
+        } else {
+            metadata.put("fileName", part.getSubmittedFileName());
+            metadata.put("size", part.getSize());
+            metadata.put("encoding", part.getHeader("Content-Transfer-Encoding"));
+            metadata.put("contentDisposition", part.getHeader("Content-Disposition"));
+            metadata.put("extension", getFileExtension(part.getSubmittedFileName()));
+            metadata.put("originalFileName", part.getSubmittedFileName());
+        }
+        return metadata;
+    }
+
+
+    /**
+     * Utility method for {@link #getPartMetadata(Part)}. Extracts the file extension from the given file name.
+     * <p>
+     * This method looks for the last period (.) in the file name and returns the substring that
+     * follows it as the file extension. If no period is found, an empty string is returned.
+     *
+     * @param fileName The file name from which to extract the extension (e.g., "image.jpg").
+     * @return The file extension in lowercase (e.g., "jpg"), or an empty string if no extension is found.
+     */
+    private static String getFileExtension(String fileName) {
+        int index = fileName.lastIndexOf('.');
+        if (index > 0) {
+            return fileName.substring(index + 1).toLowerCase();
+        }
+        return "";
     }
 }
