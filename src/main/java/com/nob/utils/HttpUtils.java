@@ -209,7 +209,7 @@ public class HttpUtils {
      * <ul>
      *   <li><code>multipart/form-data</code>: Returns the request parts.</li>
      *   <li><code>application/x-www-form-urlencoded</code>: Parses the body as a query string and returns a {@link Map} of parameters.</li>
-     *   <li>JSON: Parses the body into a generic {@link Object}.</li>
+     *   <li><code>json</code>: Parses the body into a generic {@link Object}.</li>
      * </ul>
      * If the body is empty or the content type is unsupported, the method returns <code>null</code>.
      * </p>
@@ -233,6 +233,44 @@ public class HttpUtils {
         String contentType = request.getContentType();
         if (Objects.nonNull(contentType) && contentType.contains("multipart/form-data")) {
             return getRequestParts(request);
+        }
+        String body = parseRequestBody(request);
+        if (body.trim().isEmpty()) {
+            return null;
+        }
+        if (Objects.nonNull(contentType) && contentType.contains("application/x-www-form-urlencoded")) {
+            return parseQueryString(body);
+        }
+        return parseJsonBody(body);
+    }
+
+
+    /**
+     * Retrieves the serialized content of the HTTP request body.
+     * This method processes the request body based on its content type and returns a corresponding representation.
+     * <p>
+     * The method handles different content types:
+     * <ul>
+     *     <li>{@code multipart/form-data}: If the content type is "multipart/form-data", the method processes the request parts (such as files or form data) and returns their metadata.</li>
+     *     <li>{@code application/x-www-form-urlencoded}: If the content type is "application/x-www-form-urlencoded", the method parses the query string and returns the parameters as a map.</li>
+     *     <li>{@code other}: For other content types, the method attempts to parse the body as JSON and returns it as a Java object.</li>
+     * </ul>
+     *
+     * @param request The {@link HttpServletRequest} object containing the request data.
+     * @return The parsed request body content, which can be:
+     * <ul>
+     *     <li>A list of maps containing metadata for each request part (in case of <code>multipart/form-data</code>).</li>
+     *     <li>A map containing parameters for <code>application/x-www-form-urlencoded</code>.</li>
+     *     <li>A Java object representing the JSON body content (for other content types).</li>
+     *     <li>If the body is empty or cannot be parsed, the method returns null.</li>
+     * </ul>
+     */
+    public static Object getSerializableRequestBody(HttpServletRequest request) {
+        String contentType = request.getContentType();
+        if (Objects.nonNull(contentType) && contentType.contains("multipart/form-data")) {
+            Collection<Part> parts = getRequestParts(request);
+            if (Objects.isNull(parts) || parts.isEmpty()) return null;
+            return parts.stream().map(HttpUtils::getPartMetadata).toList();
         }
         String body = parseRequestBody(request);
         if (body.trim().isEmpty()) {
@@ -297,13 +335,13 @@ public class HttpUtils {
      * @return A Map containing metadata about the uploaded file part.
      *         The map keys and their corresponding values are:
      *         <ul>
-     *         <li><strong>"fileName"</strong> : The submitted file name (e.g., "image.jpg").</li>
-     *         <li><strong>"size"</strong> : The size of the uploaded file in bytes (e.g., 1024).</li>
-     *         <li><strong>"contentType"</strong> : The MIME type of the file (e.g., "image/jpeg", "application/pdf").</li>
-     *         <li><strong>"encoding"</strong> : The encoding of the file (if available).</li>
-     *         <li><strong>"contentDisposition"</strong> : The content disposition header (e.g., "inline", "attachment").</li>
-     *         <li><strong>"extension"</strong> : The file extension (e.g., "jpg", "pdf").</li>
-     *         <li><strong>"originalFileName"</strong> : The original submitted file name (same as "fileName" in this case).</li>
+     *         <li>{@code fileName}: The submitted file name (e.g., "image.jpg").</li>
+     *         <li>{@code size}: The size of the uploaded file in bytes (e.g., 1024).</li>
+     *         <li>{@code contentType}: The MIME type of the file (e.g., "image/jpeg", "application/pdf").</li>
+     *         <li>{@code encoding}: The encoding of the file (if available).</li>
+     *         <li>{@code contentDisposition}: The content disposition header (e.g., "inline", "attachment").</li>
+     *         <li>{@code extension}: The file extension (e.g., "jpg", "pdf").</li>
+     *         <li>{@code originalFileName}: The original submitted file name (same as "fileName" in this case).</li>
      *         </ul>
      */
     public static Map<String, Object> getPartMetadata(Part part) {
