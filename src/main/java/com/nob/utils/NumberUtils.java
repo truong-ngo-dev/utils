@@ -244,7 +244,7 @@ public class NumberUtils {
         if (numberType == Byte.class) return Byte.valueOf(s);
         if (numberType == Short.class) return Short.valueOf(s);
         if (numberType == Integer.class) return Integer.valueOf(s);
-        if (numberType == Long.class) return Integer.valueOf(s);
+        if (numberType == Long.class) return Long.valueOf(s);
         if (numberType == BigInteger.class) return new BigInteger(s);
         if (numberType == Float.class) return Float.valueOf(s);
         if (numberType == Double.class) return Double.valueOf(s);
