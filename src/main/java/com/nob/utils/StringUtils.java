@@ -1,9 +1,5 @@
 package com.nob.utils;
 
-import org.springframework.expression.Expression;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -26,6 +22,8 @@ public class StringUtils {
     public static final String URL_REGEX_PREFIX = "^(?i)(%s):\\/\\/[\\w\\-]+(\\.[\\w\\-]+)+[/#?]?.*$";
 
     public static final String COLLECTION_ACCESS_REGEX = "^+\\[(\\d+)]$";
+
+    public static final String PATH_VARIABLE_REGEX = "\\{(\\w+)}";
 
 
     /**
@@ -125,14 +123,6 @@ public class StringUtils {
      * @param s The input string to be processed. Can be {@code null} or empty.
      * @return A new string with the first letter capitalized. If the input string
      *         is {@code null} or empty, the method returns the input string as-is.
-     *
-     * @example
-     * <pre>
-     * System.out.println(capitalizeFirstLetter("hello"));  // Output: "Hello"
-     * System.out.println(capitalizeFirstLetter("java"));   // Output: "Java"
-     * System.out.println(capitalizeFirstLetter(""));       // Output: ""
-     * System.out.println(capitalizeFirstLetter(null));     // Output: null
-     * </pre>
      */
     public static String capitalizeFirstLetter(String s) {
         if (s == null || s.isEmpty()) return s;
@@ -140,9 +130,42 @@ public class StringUtils {
     }
 
 
+    /**
+     * Extracts an integer index from the given string based on a predefined regex pattern.
+     *
+     * @param s The input string to extract the index from.
+     * @return The extracted index as an integer if the pattern matches; otherwise, returns -1.
+     */
     public static int extractIndex(String s) {
         Pattern pattern = Pattern.compile(COLLECTION_ACCESS_REGEX);
         Matcher matcher = pattern.matcher(s);
         return matcher.matches() ? Integer.parseInt(matcher.group(1)) : -1;
+    }
+
+
+    /**
+     * Checks if the actual URL path matches the specified template path.
+     * Converts path variables in the template to a regex pattern for matching.
+     *
+     * @param template The template path containing optional path variables.
+     * @param actualPath The actual path to compare against the template.
+     * @return {@code true} if the actual path matches the template; {@code false} otherwise.
+     */
+    public static boolean matchUrlPath(String template, String actualPath) {
+        String regex = template.replaceAll(PATH_VARIABLE_REGEX, "(?<$1>[^/]+)");
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(actualPath);
+        return matcher.matches();
+    }
+
+
+    /**
+     * Determines if the given template contains path variables based on a predefined regex pattern.
+     *
+     * @param template The template path to check for path variables.
+     * @return {@code true} if the template contains path variables; {@code false} otherwise.
+     */
+    public static boolean hasPathVariable(String template) {
+        return template.matches(PATH_VARIABLE_REGEX);
     }
 }
