@@ -21,9 +21,11 @@ public class StringUtils {
 
     public static final String URL_REGEX_PREFIX = "^(?i)(%s):\\/\\/[\\w\\-]+(\\.[\\w\\-]+)+[/#?]?.*$";
 
-    public static final String COLLECTION_ACCESS_REGEX = "^+\\[(\\d+)]$";
+    public static final String COLLECTION_ACCESS_REGEX = "^.*\\[(\\d+)]$";
 
-    public static final String PATH_VARIABLE_REGEX = "\\{(\\w+)}";
+    public static final String PATH_VARIABLE_REGEX = "\\{[^}]+}";
+
+    public static final String PATH_VARIABLE_REGEX_W_GROUP = "\\{([^}]+)}";
 
 
     /**
@@ -55,7 +57,7 @@ public class StringUtils {
      * @param mapper map string to object of T
      * @param <T> generic type of object
      * */
-    public static <T> List<T> split(String s, String delimiter, Function<String, T> mapper) {
+    public static <T> List<T>  split(String s, String delimiter, Function<String, T> mapper) {
         if (isTrimEmpty(s)) return Collections.emptyList();
         return Stream.of(s.split(delimiter)).map(mapper).collect(Collectors.toList());
     }
@@ -131,15 +133,128 @@ public class StringUtils {
 
 
     /**
-     * Extracts an integer index from the given string based on a predefined regex pattern.
+     * Extracts the index value from a string that contains square brackets enclosing an integer {@code ([i])}.
+     * The method expects the string to contain a single pair of square brackets, and the contents within
+     * the brackets should be a valid integer.
+     * <p>Example usage:</p>
+     * <blockquote>
+     * <pre>
+     *     String s1 = "array[5]";
+     *     int index1 = extractIndex(s1); // Returns: 5
      *
-     * @param s The input string to extract the index from.
-     * @return The extracted index as an integer if the pattern matches; otherwise, returns -1.
+     *     String s2 = "list[42]";
+     *     int index2 = extractIndex(s2); // Returns: 42
+     *
+     *     String s3 = "invalid[abc]";
+     *     try {
+     *         int index3 = extractIndex(s3); // Throws IllegalArgumentException
+     *     } catch (IllegalArgumentException e) {
+     *         System.out.println(e.getMessage()); // Output: Invalid index: abc
+     *     }
+     * </pre>
+     * </blockquote>
+     * @param expression an array access expression, which is a string containing square brackets
+     *                   enclosing an integer (e.g., "array[5]", "list[42]").
+     * @return the integer value inside the square brackets, representing the index for accessing an element
+     * @throws IllegalArgumentException if the input string does not contain a valid expression with square brackets,
+     *                                  or if the value inside the brackets is not a valid integer
      */
-    public static int extractIndex(String s) {
-        Pattern pattern = Pattern.compile(COLLECTION_ACCESS_REGEX);
-        Matcher matcher = pattern.matcher(s);
-        return matcher.matches() ? Integer.parseInt(matcher.group(1)) : -1;
+    public static int extractIndex(String expression) {
+        if (expression.contains("[") && expression.contains("]")) {
+            int startIndex = expression.indexOf("[") + 1;
+            int endIndex = expression.indexOf("]");
+            if (startIndex < endIndex) {
+                String index = expression.substring(startIndex, endIndex);
+                try {
+                    return Integer.parseInt(index);
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException("Invalid index: " + index);
+                }
+            } else {
+                throw new IllegalArgumentException("Invalid expression: " + expression);
+            }
+        }
+        throw new IllegalArgumentException("Invalid expression: " + expression);
+    }
+
+
+    /**
+     * Extracts the array or collection identifier (the part before the square brackets) from a string.
+     * The method expects the string to contain an expression with square brackets enclosing an index,
+     * and it returns the identifier (the part before the brackets).
+     *
+     * <p>Example usage:</p>
+     * <blockquote>
+     * <pre>
+     *     String expression1 = "array[5]";
+     *     String identifier1 = extractArrayIdentifier(expression1); // Returns: "array"
+     *
+     *     String expression2 = "list[42]";
+     *     String identifier2 = extractArrayIdentifier(expression2); // Returns: "list"
+     *
+     *     String expression3 = "invalid[abc]";
+     *     try {
+     *         String identifier3 = extractArrayIdentifier(expression3); // Throws IllegalArgumentException
+     *     } catch (IllegalArgumentException e) {
+     *         System.out.println(e.getMessage()); // Output: Invalid expression: invalid[abc]
+     *     }
+     * </pre>
+     * </blockquote>
+     * @param expression a string representing an array or collection access expression, which contains
+     *                   an identifier (e.g., "array" or "list") followed by square brackets enclosing an index
+     *                   (e.g., "array[5]", "list[42]").
+     * @return the identifier part of the array or collection access expression (e.g., "array", "list")
+     * @throws IllegalArgumentException if the input string does not contain valid square brackets,
+     *                                  or if the format is incorrect (e.g., brackets are misplaced)
+     */
+    public static String extractArrayIdentifier(String expression) {
+        if (expression.contains("[") && expression.contains("]")) {
+            int s = expression.indexOf("[") + 1;
+            int e = expression.indexOf("]");
+            if (s > e) throw new IllegalArgumentException("Invalid expression: " + expression);
+            int endIndex = s - 1;
+            return expression.substring(0, endIndex);
+        }
+        throw new IllegalArgumentException("Invalid expression: " + expression);
+    }
+
+
+    /**
+     * Checks if the given string is a valid array access expression.
+     * A valid array access expression contains square brackets enclosing an integer, and optionally,
+     * can include an identifier (such as "array[0]" or "[0]").
+     *
+     * <blockquote>
+     * <pre>
+     *     String expression1 = "array[5]";
+     *     boolean isValid1 = isArrayAccessExpression(expression1); // Returns: true
+     *
+     *     String expression2 = "[42]";
+     *     boolean isValid2 = isArrayAccessExpression(expression2); // Returns: true
+     *
+     *     String expression3 = "invalid[abc]";
+     *     boolean isValid3 = isArrayAccessExpression(expression3); // Returns: false
+     * </pre>
+     * </blockquote>
+     *
+     * @param expression the string to check if it represents a valid array access expression
+     * @return true if the string is a valid array access expression, false otherwise
+     */
+    public static boolean isArrayAccessExpression(String expression) {
+        if (expression.contains("[") && expression.contains("]") && expression.endsWith("]")) {
+            int startIndex = expression.indexOf("[");
+            int endIndex = expression.indexOf("]");
+            if (startIndex < endIndex) {
+                String insideBrackets = expression.substring(startIndex + 1, endIndex);
+                try {
+                    Integer.parseInt(insideBrackets);
+                    return true;
+                } catch (NumberFormatException e) {
+                    return false;
+                }
+            }
+        }
+        return false;
     }
 
 
@@ -152,7 +267,7 @@ public class StringUtils {
      * @return {@code true} if the actual path matches the template; {@code false} otherwise.
      */
     public static boolean matchUrlPath(String template, String actualPath) {
-        String regex = template.replaceAll(PATH_VARIABLE_REGEX, "(?<$1>[^/]+)");
+        String regex = template.replaceAll(PATH_VARIABLE_REGEX_W_GROUP, "(?<$1>[^/]+)");
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(actualPath);
         return matcher.matches();
@@ -166,6 +281,6 @@ public class StringUtils {
      * @return {@code true} if the template contains path variables; {@code false} otherwise.
      */
     public static boolean hasPathVariable(String template) {
-        return template.matches(PATH_VARIABLE_REGEX);
+        return template.matches(".*\\{[^}]+}.*");
     }
 }

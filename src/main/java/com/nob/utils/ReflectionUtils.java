@@ -1,10 +1,15 @@
 package com.nob.utils;
 
+import lombok.Data;
+import org.springframework.expression.Expression;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ReflectionUtils {
 
@@ -82,23 +87,23 @@ public class ReflectionUtils {
         Object target = obj;
         Object value = null;
         for (int i = 0; i < paths.length; i++) {
-            String p = paths[i];
-            if (Objects.isNull(target)) throw new IllegalArgumentException("Path '" + p + "' error");
-            if (p.matches(".*\\[\\d+]$")) {
-                String prefix = p.substring(0, p.length() - 3);
-                int index = StringUtils.extractIndex(p);
+            String expression = paths[i];
+            if (Objects.isNull(target)) throw new IllegalArgumentException("Path '" + expression + "' error");
+            if (StringUtils.isArrayAccessExpression(expression)) {
+                String prefix = StringUtils.extractArrayIdentifier(expression);
+                int index = StringUtils.extractIndex(expression);
                 if (!prefix.isEmpty()) {
                     Object base = getValueOfNonCollectionObject(target, prefix);
-                    if (Objects.isNull(base)) throw new IllegalArgumentException("Path '" + p + "' error");
-                    value = getCollectionElement(p, index, base);
+                    if (Objects.isNull(base)) throw new IllegalArgumentException("Path '" + expression + "' error");
+                    value = getCollectionElement(expression, index, base);
                 } else {
-                    value = getCollectionElement(p, index, target);
+                    value = getCollectionElement(expression, index, target);
                 }
             } else {
-                value = getValueOfNonCollectionObject(target, p);
+                value = getValueOfNonCollectionObject(target, expression);
             }
             if (i != paths.length - 1) {
-                if (value == null) throw new IllegalArgumentException("Path '" + p + "' error");
+                if (value == null) throw new IllegalArgumentException("Path '" + expression + "' error");
                 else target = value;
             } else {
                 target = value;
@@ -152,4 +157,82 @@ public class ReflectionUtils {
         if (TypeUtils.isMap(obj.getClass())) return ((Map<?, ?>) obj).get(name);
         return getFieldValue(obj, name);
     }
+
+//    public static void main(String[] args) {
+//        testSpEL();
+//        System.out.println();
+//        testUtils();
+//    }
+//
+//    public static void testSpEL() {
+//        User user = prepareUser();
+//        String expr = "roles[0].scopes[0].name";
+//        Long spELStart = System.currentTimeMillis();
+//        for (int i = 0; i < 1000; i++) {
+//            ExpressionParser parser = new SpelExpressionParser();
+//            Expression expression = parser.parseExpression(expr);
+//            expression.getValue(user);
+//        }
+//        Long spELEnd = System.currentTimeMillis();
+//        long duration = spELEnd - spELStart;
+//        System.out.printf("SpEL execution time: %d, average: %s", duration, new BigDecimal(duration).divide(BigDecimal.valueOf(1000), RoundingMode.HALF_UP).longValue());
+//    }
+//
+//    public static void testUtils() {
+//        User user = prepareUser();
+//        String expr = "roles[0].scopes[0].name";
+//        Long spELStart = System.currentTimeMillis();
+//        for (int i = 0; i < 1000; i++) {
+//            getObjectValue(user, expr);
+//        }
+//        Long spELEnd = System.currentTimeMillis();
+//        long duration = spELEnd - spELStart;
+//        System.out.printf("Utils execution time: %d, average: %s", duration, new BigDecimal(duration).divide(BigDecimal.valueOf(1000), RoundingMode.HALF_UP).longValue());
+//    }
+//
+//    public static User prepareUser() {
+//        User user = new User();
+//        user.setName("John Doe");
+//        user.setAge("30");
+//
+//        List<Scope> adminScopes = new ArrayList<>();
+//        adminScopes.add(new Scope(1L, "READ"));
+//        adminScopes.add(new Scope(2L, "WRITE"));
+//
+//        Role adminRole = new Role();
+//        adminRole.setId(1L);
+//        adminRole.setName("ADMIN");
+//        adminRole.setScopes(adminScopes);
+//
+//        List<Role> roles = new ArrayList<>();
+//        roles.add(adminRole);
+//
+//        user.setRoles(roles);
+//        return user;
+//    }
+//
+//    @Data
+//    static class User {
+//        String name;
+//        String age;
+//        List<Role> roles;
+//    }
+//
+//    @Data
+//    static class Role {
+//        Long id;
+//        String name;
+//        List<Scope> scopes;
+//    }
+//
+//    @Data
+//    static class Scope {
+//        Long id;
+//        String name;
+//
+//        public Scope(Long id, String name) {
+//            this.id = id;
+//            this.name = name;
+//        }
+//    }
 }
