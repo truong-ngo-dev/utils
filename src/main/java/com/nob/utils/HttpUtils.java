@@ -17,6 +17,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Utility class for HTTP-related operations.
+ * <p>
+ * This class provides static methods for extracting and processing HTTP
+ * request data, such as retrieving the request URL, URI, context path,
+ * query string, and servlet patterns. It is intended to simplify common
+ * operations related to {@link HttpServletRequest}.
+ * @author Truong Ngo
+ */
 @Slf4j
 public class HttpUtils {
 
