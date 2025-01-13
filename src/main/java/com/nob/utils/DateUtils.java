@@ -399,4 +399,210 @@ public class DateUtils {
         Instant date2 = toInstant(rhs, ZoneId.systemDefault());
         return date1.compareTo(date2);
     }
+
+
+    /**
+     * Retrieves the year from an object that can be converted to a {@link LocalDate}.
+     * <p>
+     * This method converts the provided object into an {@link Instant} using the {@link #toInstantSystem(Object)}
+     * method, then converts that {@link Instant} into a {@link LocalDate} based on the system's default time zone.
+     * It returns the year part of the resulting {@link LocalDate}.
+     * </p>
+     *
+     * <p>
+     * For example, if the object represents a date corresponding to {@code 2025-01-13}, this method
+     * will return {@code 2025}.
+     * </p>
+     *
+     * @param o the object to extract the year from, which will be converted to an {@link Instant}
+     *          and then to a {@link LocalDate}
+     * @return the year as an {@link Integer}
+     * @throws DateTimeException if the object cannot be converted into an {@link Instant}
+     */
+    public static Integer getYear(Object o) {
+        Instant instant = toInstantSystem(o);
+        LocalDate date = instant.atZone(ZoneId.systemDefault()).toLocalDate();
+        return date.getYear();
+    }
+
+
+    /**
+     * Retrieves the current year.
+     * <p>
+     * This method returns the current year based on the system's default time zone.
+     * It uses {@link java.time.LocalDate} to extract the year from the current date.
+     * </p>
+     *
+     * <p>
+     * For example, if the current date is {@code 2025-01-13}, this method will return
+     * {@code 2025}.
+     * </p>
+     *
+     * @return the current year as an {@link Integer}
+     */
+    public static Integer getCurrentYear() {
+        return java.time.LocalDate.now().getYear();
+    }
+
+
+    /**
+     * Retrieves the month from an object that can be converted to a {@link LocalDate}.
+     * <p>
+     * This method converts the provided object into an {@link Instant} using the {@link #toInstantSystem(Object)}
+     * method, then converts that {@link Instant} into a {@link LocalDate} based on the system's default time zone.
+     * It returns the month part of the resulting {@link LocalDate} as an integer, where {@code 1} represents January
+     * and {@code 12} represents December.
+     * </p>
+     *
+     * <p>
+     * For example, if the object represents a date corresponding to {@code 2025-01-13}, this method will return
+     * {@code 1} (for January).
+     * </p>
+     *
+     * @param o the object to extract the month from, which will be converted to an {@link Instant}
+     *          and then to a {@link LocalDate}
+     * @return the month as an {@link Integer}, where {@code 1} is January and {@code 12} is December
+     * @throws DateTimeException if the object cannot be converted into an {@link Instant}
+     */
+    public static Integer getMonth(Object o) {
+        Instant instant = toInstantSystem(o);
+        LocalDate date = instant.atZone(ZoneId.systemDefault()).toLocalDate();
+        return date.getMonthValue();
+    }
+
+
+    /**
+     * Retrieves the current month.
+     * <p>
+     * This method returns the current month based on the system's default time zone.
+     * It uses {@link java.time.LocalDate} to extract the month from the current date.
+     * The month is represented as an integer, with {@code 1} for January and {@code 12} for December.
+     * </p>
+     *
+     * <p>
+     * For example, if the current date is {@code 2025-01-13}, this method will return
+     * {@code 1} (for January).
+     * </p>
+     *
+     * @return the current month as an {@link Integer}, where {@code 1} is January and
+     *         {@code 12} is December
+     */
+    public static Integer getCurrentMonth() {
+        return java.time.LocalDate.now().getMonthValue();
+    }
+
+
+    /**
+     * Retrieves the day of the month from an object that can be converted to a {@link LocalDate}.
+     * <p>
+     * This method converts the provided object into an {@link Instant} using the {@link #toInstantSystem(Object)}
+     * method, then converts that {@link Instant} into a {@link LocalDate} based on the system's default time zone.
+     * It returns the day of the month as an integer.
+     * </p>
+     *
+     * <p>
+     * For example, if the object represents a date corresponding to {@code 2025-01-13}, this method will return
+     * {@code 13}.
+     * </p>
+     *
+     * @param o the object to extract the day from, which will be converted to an {@link Instant}
+     *          and then to a {@link LocalDate}
+     * @return the day of the month as an {@link Integer}
+     * @throws DateTimeException if the object cannot be converted into an {@link Instant}
+     */
+    public static Integer getDay(Object o) {
+        Instant instant = toInstantSystem(o);
+        LocalDate date = instant.atZone(ZoneId.systemDefault()).toLocalDate();
+        return date.getDayOfMonth();
+    }
+
+
+    /**
+     * Retrieves the current day of the month.
+     * <p>
+     * This method returns the day of the month based on the system's default time zone.
+     * It uses {@link java.time.LocalDate} to extract the day from the current date.
+     * The day is represented as an integer, where the value ranges from {@code 1} to {@code 31}
+     * depending on the month.
+     * </p>
+     *
+     * <p>
+     * For example, if the current date is {@code 2025-01-13}, this method will return
+     * {@code 13}.
+     * </p>
+     *
+     * @return the current day of the month as an {@link Integer}
+     */
+    public static Integer getCurrentDay() {
+        return java.time.LocalDate.now().getDayOfMonth();
+    }
+
+
+    /**
+     * Retrieves the day of the week from an object that can be converted to a {@link LocalDate}.
+     * <p>
+     * This method converts the provided object into an {@link Instant} using the {@link #toInstantSystem(Object)}
+     * method, then converts that {@link Instant} into a {@link LocalDate} based on the system's default time zone.
+     * It returns the day of the week as a {@link DayOfWeek} value.
+     * </p>
+     *
+     * <p>
+     * For example, if the object represents a date corresponding to {@code 2025-01-13} (a Monday),
+     * this method will return {@link DayOfWeek#MONDAY}.
+     * </p>
+     *
+     * @param o the object to extract the day of the week from, which will be converted to an {@link Instant}
+     *          and then to a {@link LocalDate}
+     * @return the day of the week as a {@link DayOfWeek}
+     * @throws DateTimeException if the object cannot be converted into an {@link Instant}
+     */
+    public static DayOfWeek getDayOfWeek(Object o) {
+        Instant instant = toInstantSystem(o);
+        LocalDate date = instant.atZone(ZoneId.systemDefault()).toLocalDate();
+        return date.getDayOfWeek();
+    }
+
+
+    /**
+     * Retrieves the current day of the week.
+     * <p>
+     * This method uses {@link java.time.LocalDate} to obtain the current date, then returns the day of the week
+     * as a {@link DayOfWeek} value (e.g., {@link DayOfWeek#MONDAY}, {@link DayOfWeek#TUESDAY}, etc.).
+     * </p>
+     *
+     * <p>
+     * For example, if today is Monday, the method will return {@code MONDAY}.
+     * </p>
+     *
+     * @return the current day of the week as a {@link DayOfWeek}
+     */
+    public static DayOfWeek getCurrentDayOfWeek() {
+        return java.time.LocalDate.now().getDayOfWeek();
+    }
+
+
+    /**
+     * Retrieves the Vietnamese name of a given {@link DayOfWeek}.
+     * <p>
+     * This method takes a {@link DayOfWeek} value and returns its corresponding name in Vietnamese.
+     * </p>
+     *
+     * <p>
+     * For example, if the input is {@link DayOfWeek#MONDAY}, the method will return {@code "Thứ Hai"}.
+     * </p>
+     *
+     * @param dayOfWeek the {@link DayOfWeek} to convert into Vietnamese
+     * @return the Vietnamese name of the day of the week
+     */
+    public static String getDayOfWeekInVietnamese(DayOfWeek dayOfWeek) {
+        return switch (dayOfWeek) {
+            case MONDAY -> "Thứ Hai";
+            case TUESDAY -> "Thứ Ba";
+            case WEDNESDAY -> "Thứ Tư";
+            case THURSDAY -> "Thứ Năm";
+            case FRIDAY -> "Thứ Sáu";
+            case SATURDAY -> "Thứ Bảy";
+            case SUNDAY -> "Chủ Nhật";
+        };
+    }
 }
