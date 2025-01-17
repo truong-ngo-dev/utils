@@ -3,6 +3,7 @@ package com.nob.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.util.Objects;
 
@@ -15,6 +16,12 @@ public class JsonUtils {
      * Default object mapper
      * */
     private static final ObjectMapper MAPPER = new ObjectMapper();
+
+
+    static {
+        MAPPER.registerModule(new JavaTimeModule());
+        MAPPER.findAndRegisterModules();
+    }
 
 
     /**
