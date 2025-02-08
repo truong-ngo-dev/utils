@@ -94,6 +94,7 @@ public class HttpUtils {
     public static String getFullUrl(HttpServletRequest request) {
         String url = getUrl(request);
         String queryString = getQueryString(request);
+        if (Objects.isNull(queryString) || queryString.isEmpty()) return url;
         return url + "?" + queryString;
     }
 
