@@ -537,7 +537,6 @@ public class DateUtils {
         return java.time.LocalDate.now().getDayOfMonth();
     }
 
-
     /**
      * Retrieves the day of the week from an object that can be converted to a {@link LocalDate}.
      * <p>
@@ -603,6 +602,32 @@ public class DateUtils {
             case FRIDAY -> "Thứ Sáu";
             case SATURDAY -> "Thứ Bảy";
             case SUNDAY -> "Chủ Nhật";
+        };
+    }
+
+
+    /**
+     * Retrieves the Vietnamese code of a given {@link DayOfWeek}.
+     * <p>
+     * This method takes a {@link DayOfWeek} value and returns its corresponding name in Vietnamese code.
+     * </p>
+     *
+     * <p>
+     * For example, if the input is {@link DayOfWeek#MONDAY}, the method will return {@code "T2"}.
+     * </p>
+     *
+     * @param dayOfWeek the {@link DayOfWeek} to convert into Vietnamese code
+     * @return the Vietnamese name of the day of the week
+     */
+    public static String getDayOfWeekInVietnameseCode(DayOfWeek dayOfWeek) {
+        return switch (dayOfWeek) {
+            case MONDAY -> "T2";
+            case TUESDAY -> "T3";
+            case WEDNESDAY -> "T4";
+            case THURSDAY -> "T5";
+            case FRIDAY -> "T6";
+            case SATURDAY -> "T7";
+            case SUNDAY -> "CN";
         };
     }
 }
