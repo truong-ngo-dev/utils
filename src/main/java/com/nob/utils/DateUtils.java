@@ -4,6 +4,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -27,48 +28,292 @@ public class DateUtils {
         throw new UnsupportedOperationException("Cannot be instantiated!");
     }
 
+    /**
+     * A list of common date patterns used for date parsing and formatting.
+     * <p>
+     * The patterns include various formats with different separators such as dashes (-),
+     * slashes (/), dots (.), and commas (,). It also includes patterns with abbreviated
+     * month names (MMM).
+     * </p>
+     * <p>
+     * Example patterns:
+     * <ul>
+     *     <li>{@code yyyy-MM-dd} (ISO 8601 format)</li>
+     *     <li>{@code d-M-yyyy}, {@code yyyy-M-d}</li>
+     *     <li>{@code d/MMM/yyyy}, {@code MMM d, yyyy}</li>
+     *     <li>{@code yyyy MMM d}, {@code yyyy,d,MMM}</li>
+     * </ul>
+     * </p>
+     */
+    public static final List<String> DATE_PATTERNS = List.of(
+            // With (-) separator
+            "d-M-yyyy", "yyyy-M-d",
+            // With (/) separator
+            "d/M/yyyy", "yyyy/M/d",
+            // With (.) separator
+            "d.M.yyyy", "yyyy.M.d",
+            // With (,) separator
+            "d,M,yyyy", "yyyy,M,d",
+            // With ( ) separator
+            "d M yyyy", "yyyy M d",
+
+            // Abbreviated month (MMM) - (-)
+            "d-MMM-yyyy", "MMM-d-yyyy", "yyyy-MMM-d", "yyyy-d-MMM",
+            // Abbreviated month (MMM) - (/)
+            "d/MMM/yyyy", "MMM/d/yyyy", "yyyy/MMM/d", "yyyy/d/MMM",
+            // Abbreviated month (MMM) - (.)
+            "d.MMM.yyyy", "MMM.d.yyyy", "yyyy.MMM.d", "yyyy.d.MMM",
+            // Abbreviated month (MMM) - (,)
+            "d,MMM,yyyy", "MMM,d,yyyy", "yyyy,MMM,d", "yyyy,d,MMM",
+            // Abbreviated month (MMM) - ( )
+            "d MMM yyyy", "MMM d yyyy", "yyyy MMM d", "yyyy d MMM",
+            // Abbreviated month (MMM) with comma - (MMM,)
+            "MMM d, yyyy", "d MMM, yyyy"
+    );
+
+
+    /**
+     * A list of common date-time patterns used for parsing and formatting date-time values.
+     * <p>
+     * The patterns include different formats with various separators and time zone representations.
+     * It supports:
+     * </p>
+     * <ul>
+     *     <li>ISO 8601 formats with and without milliseconds</li>
+     *     <li>Time zones using zone IDs (e.g., {@code [Europe/Paris]})</li>
+     *     <li>Time zones using offsets (e.g., {@code +01:00})</li>
+     *     <li>Different decimal and comma separators for milliseconds</li>
+     *     <li>Formats with and without the 'T' separator</li>
+     * </ul>
+     * <p>
+     * Example patterns:
+     * <ul>
+     *     <li>{@code yyyy-MM-dd'T'HH:mm:ss.SSS'['VV']'} → 1999-03-22T05:06:07.000[Europe/Paris]</li>
+     *     <li>{@code yyyy-MM-dd HH:mm:ss.SSSXXX} → 1999-03-22 05:06:07.000+01:00</li>
+     *     <li>{@code yyyy-MM-dd'T'HH:mm:ss'Z'} → 1999-03-22T05:06:07Z</li>
+     * </ul>
+     * </p>
+     */
+    public static final List<String> DATE_TIME_PATTERNS = List.of(
+
+            // Timezone type [VV]
+            "yyyy-MM-dd'T'HH:mm:ss.SSSXXX'['VV']'",
+            "yyyy-MM-dd'T'HH:mm:ss,SSSXXX'['VV']'",
+            "yyyy-MM-dd HH:mm:ss.SSSXXX'['VV']'",
+            "yyyy-MM-dd HH:mm:ss,SSSXXX'['VV']'",
+            "yyyy-MM-dd'T'HH:mm:ssXXX'['VV']'",
+            "yyyy-MM-dd HH:mm:ssXXX'['VV']'",
+            "yyyy-MM-dd'T'HH:mm:ss.SSS'['VV']'",
+            "yyyy-MM-dd'T'HH:mm:ss,SSS'['VV']'",
+            "yyyy-MM-dd HH:mm:ss.SSS'['VV']'",
+            "yyyy-MM-dd HH:mm:ss,SSS'['VV']'",
+
+            // Timezone type (XXX, X, Z)
+            "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
+            "yyyy-MM-dd'T'HH:mm:ss,SSSXXX",
+            "yyyy-MM-dd HH:mm:ss.SSSXXX",
+            "yyyy-MM-dd HH:mm:ss,SSSXXX",
+            "yyyy-MM-dd'T'HH:mm:ssX",
+            "yyyy-MM-dd HH:mm:ssX",
+            "yyyy-MM-dd'T'HH:mm:ssZ",
+            "yyyy-MM-dd HH:mm:ssZ",
+            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+            "yyyy-MM-dd'T'HH:mm:ss,SSS'Z'",
+            "yyyy-MM-dd HH:mm:ss.SSS'Z'",
+            "yyyy-MM-dd HH:mm:ss,SSS'Z'",
+
+            // No timezone
+            "yyyy-MM-dd'T'HH:mm:ss.SSS",
+            "yyyy-MM-dd'T'HH:mm:ss,SSS",
+            "yyyy-MM-dd HH:mm:ss.SSS",
+            "yyyy-MM-dd HH:mm:ss,SSS",
+            "yyyy-MM-dd'T'HH:mm:ss",
+            "yyyy-MM-dd HH:mm:ss"
+
+    );
+
+
+    /**
+     * Parses a string into a {@link LocalDate}.
+     * <p>
+     * This method attempts to parse the input string using multiple date and date-time formats.
+     * It first tries the default {@link LocalDate#parse(CharSequence)} method.
+     * If that fails, it iterates over predefined date patterns ({@code DATE_PATTERNS}).
+     * If still unsuccessful, it attempts to parse using date-time patterns ({@code DATE_TIME_PATTERNS}),
+     * extracting only the {@link LocalDate} part.
+     * </p>
+     * <p>
+     * If the string cannot be parsed into a {@code LocalDate}, an {@link IllegalArgumentException} is thrown.
+     * </p>
+     *
+     * @param s the date string to parse (must not be null)
+     * @return a {@link LocalDate} parsed from the input string, or {@code null} if input is null
+     * @throws IllegalArgumentException if the string cannot be parsed into a {@code LocalDate}
+     */
+    public static LocalDate parseLocalDate(String s) {
+        if (s == null) return null;
+        try {
+            return LocalDate.parse(s);
+        } catch (DateTimeParseException | IllegalArgumentException ignored) {}
+        for (String pattern : DATE_PATTERNS) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+                return LocalDate.parse(s, formatter);
+            } catch (DateTimeParseException | IllegalArgumentException ignored) {}
+        }
+        for (String pattern : DATE_TIME_PATTERNS) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+                return LocalDateTime.parse(s, formatter).toLocalDate();
+            } catch (DateTimeParseException | IllegalArgumentException ignored) {}
+        }
+        throw new IllegalArgumentException("Could not parse to java.time.LocalDate: " + s);
+    }
+
+
+    /**
+     * Parses a string into a {@link LocalDateTime}.
+     * <p>
+     * This method attempts to parse the input string using multiple date-time and date formats.
+     * It first tries the default {@link LocalDateTime#parse(CharSequence)} method.
+     * If that fails, it iterates over predefined date-time patterns ({@code DATE_TIME_PATTERNS}).
+     * If still unsuccessful, it attempts to parse using date patterns ({@code DATE_PATTERNS})
+     * and sets the time to midnight ({@code 00:00:00}).
+     * </p>
+     * <p>
+     * If the string cannot be parsed into a {@code LocalDateTime}, an {@link IllegalArgumentException} is thrown.
+     * </p>
+     *
+     * @param s the date-time string to parse (must not be null)
+     * @return a {@link LocalDateTime} parsed from the input string, or {@code null} if input is null
+     * @throws IllegalArgumentException if the string cannot be parsed into a {@code LocalDateTime}
+     */
+    public static LocalDateTime parseLocalDateTime(String s) {
+        if (s == null) return null;
+        try {
+            return LocalDateTime.parse(s);
+        } catch (DateTimeParseException | IllegalArgumentException ignored) {}
+        for (String pattern : DATE_TIME_PATTERNS) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+                return LocalDateTime.parse(s, formatter);
+            } catch (DateTimeParseException | IllegalArgumentException ignored) {}
+        }
+        for (String pattern : DATE_PATTERNS) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+                LocalDate ld = LocalDate.parse(s, formatter);
+                return ld.atStartOfDay();
+            } catch (DateTimeParseException | IllegalArgumentException ignored) {}
+        }
+        throw new IllegalArgumentException("Could not parse to java.time.LocalDateTime: " + s);
+    }
+
+
+    /**
+     * Parses a string into a {@link Date} using the specified {@link ZoneId}.
+     * <p>
+     * This method first attempts to parse the input string into a {@link LocalDateTime}
+     * using {@link #parseLocalDateTime(String)}. Then, it converts the {@code LocalDateTime}
+     * to an {@link Instant} based on the given time zone and finally returns a {@link Date} object.
+     * </p>
+     *
+     * @param s       the date-time string to parse (must not be null)
+     * @param zoneId  the time zone to apply when converting to {@link Date}
+     * @return a {@link Date} representing the parsed date-time, or {@code null} if input is null
+     * @throws IllegalArgumentException if the string cannot be parsed into a valid {@link LocalDateTime}
+     */
+    public static Date parseDate(String s, ZoneId zoneId) {
+        if (s == null) return null;
+        LocalDateTime ldt = parseLocalDateTime(s);
+        Instant instant = ldt.atZone(zoneId).toInstant();
+        return Date.from(instant);
+    }
+
+
+    /**
+     * Parses a string into a {@link ZonedDateTime} using the specified {@link ZoneId}.
+     * <p>
+     * This method first attempts to parse the input string into a {@link LocalDateTime}
+     * using {@link #parseLocalDateTime(String)}. Then, it applies the given {@code ZoneId}
+     * to create a {@link ZonedDateTime}.
+     * </p>
+     *
+     * @param s       the date-time string to parse (must not be null)
+     * @param zoneId  the time zone to apply when converting to {@link ZonedDateTime}
+     * @return a {@link ZonedDateTime} representing the parsed date-time, or {@code null} if input is null
+     * @throws IllegalArgumentException if the string cannot be parsed into a valid {@link LocalDateTime}
+     */
+    public static ZonedDateTime parseZonedDateTime(String s, ZoneId zoneId) {
+        if (s == null) return null;
+        LocalDateTime ldt = parseLocalDateTime(s);
+        return ldt.atZone(zoneId);
+    }
+
+
+    /**
+     * Parses a string into an {@link Instant} using the specified {@link ZoneId}.
+     * <p>
+     * This method first attempts to parse the input string into a {@link LocalDateTime}
+     * using {@link #parseLocalDateTime(String)}. Then, it applies the given {@code ZoneId}
+     * to convert it into an {@link Instant}.
+     * </p>
+     *
+     * @param s       the date-time string to parse (must not be null)
+     * @param zoneId  the time zone to apply when converting to {@link Instant}
+     * @return an {@link Instant} representing the parsed date-time, or {@code null} if input is null
+     * @throws IllegalArgumentException if the string cannot be parsed into a valid {@link LocalDateTime}
+     */
+    public static Instant parseInstant(String s, ZoneId zoneId) {
+        if (s == null) return null;
+        LocalDateTime ldt = parseLocalDateTime(s);
+        return ldt.atZone(zoneId).toInstant();
+    }
+
 
     /**
      * Parses a string into a date object of the specified type {@code T}.
      * <p>
-     * This method supports parsing strings in ISO-8601 format for the following target types:
+     * This method supports parsing strings in multiple formats, including ISO-8601.
+     * The following types are supported:
+     * <ul>
+     *     <li>{@link LocalDate} - Represents a date without time-zone.</li>
+     *     <li>{@link LocalDateTime} - Represents a date-time without time-zone.</li>
+     *     <li>{@link Instant} - Represents an instantaneous point on the time-line in UTC.</li>
+     *     <li>{@link Date} - Legacy {@link java.util.Date} object with time-zone conversion.</li>
+     *     <li>{@link ZonedDateTime} - Represents a date-time with a time-zone.</li>
+     * </ul>
+     * </p>
      *
      * <p><strong>Example Usage:</strong></p>
      * <pre>{@code
      * String isoDate = "2023-12-31";
-     * LocalDate date = DateUtils.parseDate(isoDate, LocalDate.class, ZoneId.of("UTC"));
-     * System.out.println(dateTime); // Output: 2023-12-31
+     * LocalDate date = DateTimeParserUtil.parse(isoDate, LocalDate.class, ZoneId.of("UTC"));
+     * System.out.println(date); // Output: 2023-12-31
+     *
+     * String isoDateTime = "2023-12-31T12:45:30";
+     * LocalDateTime dateTime = DateTimeParserUtil.parse(isoDateTime, LocalDateTime.class, ZoneId.of("UTC"));
+     * System.out.println(dateTime); // Output: 2023-12-31T12:45:30
      * }</pre>
      *
      * @param <T>        The type of the desired date object.
-     * @param s          The string representing the date (in ISO-8601 format).
+     * @param s          The string representing the date.
      * @param targetType The target class type for the parsed date (e.g., {@code LocalDate.class}).
      * @param zoneId     The {@link ZoneId} to apply if the target type requires time-zone information.
      * @return A parsed date object of the specified type {@code T}.
      *
      * @throws IllegalArgumentException if the string cannot be parsed or the target type is unsupported.
      */
-    public static <T> T parseDate(String s, Class<T> targetType, ZoneId zoneId)  {
+    public static <T> T parse(String s, Class<T> targetType, ZoneId zoneId)  {
         try {
-            if (targetType == LocalDate.class) {
-                return targetType.cast(LocalDate.parse(s));
-            } else if (targetType == LocalDateTime.class) {
-                return targetType.cast(LocalDateTime.parse(s));
-            } else if (targetType == Instant.class) {
-                LocalDateTime dateTime = LocalDateTime.parse(s);
-                return targetType.cast(dateTime.atZone(zoneId).toInstant());
-            } else if (targetType == Date.class) {
-                LocalDateTime dateTime = LocalDateTime.parse(s);
-                Instant instant = dateTime.atZone(zoneId).toInstant();
-                return targetType.cast(Date.from(instant));
-            } else if (targetType == ZonedDateTime.class) {
-                LocalDateTime dateTime = LocalDateTime.parse(s);
-                return targetType.cast(dateTime.atZone(zoneId));
-            } else {
-                throw new IllegalArgumentException("Unsupported target type: " + targetType);
-            }
+            if (targetType == LocalDate.class) return targetType.cast(parseLocalDate(s));
+            if (targetType == LocalDateTime.class) return targetType.cast(parseLocalDateTime(s));
+            if (targetType == Instant.class) return targetType.cast(parseInstant(s, zoneId));
+            if (targetType == Date.class) return targetType.cast(parseDate(s, zoneId));
+            if (targetType == ZonedDateTime.class) return targetType.cast(parseZonedDateTime(s, zoneId));
+            throw new IllegalArgumentException("Unsupported target type: " + targetType);
         } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("Invalid date format: " + s, e);
+            throw new IllegalArgumentException("Invalid date data: " + s, e);
         }
     }
 
@@ -93,7 +338,7 @@ public class DateUtils {
      * @return A parsed date object of the specified type {@code T}.
      * @throws IllegalArgumentException if the string cannot be parsed, the pattern is invalid, or the target type is unsupported.
      */
-    public static <T> T parseDate(String s, String pattern, Class<T> targetType, ZoneId zoneId)  {
+    public static <T> T parse(String s, String pattern, Class<T> targetType, ZoneId zoneId)  {
         DateTimeFormatter formatter;
         try {
             formatter = DateTimeFormatter.ofPattern(pattern);
@@ -127,7 +372,7 @@ public class DateUtils {
     /**
      * Parses a given string in ISO-8601 format into a date object of the specified type {@code T}, using UTC+0 as the default time zone.
      * <p>
-     * This method serves as a simplified wrapper for {@link #parseDate(String, Class, ZoneId)} with the time zone set to UTC.
+     * This method serves as a simplified wrapper for {@link #parse(String, Class, ZoneId)} with the time zone set to UTC.
      * It supports the same set of date types as the underlying {@code parseDate} method.
      *
      * @param <T>        The type of the desired date object.
@@ -136,16 +381,16 @@ public class DateUtils {
      * @return A parsed date object of the specified type {@code T}.
      * @throws IllegalArgumentException if the string format is invalid or the target type is unsupported.
      */
-    public static <T> T parseDateWithUTC(String s, Class<T> targetType) {
+    public static <T> T parseWithUTC(String s, Class<T> targetType) {
         ZoneId zoneId = ZoneOffset.UTC;
-        return parseDate(s, targetType, zoneId);
+        return parse(s, targetType, zoneId);
     }
 
 
     /**
      * Parses a given string into a date object of type {@code T} using the specified pattern and UTC+0 as the time zone.
      * <p>
-     * This method acts as a simplified wrapper for {@link #parseDate(String, String, Class, ZoneId)}, with the time zone set to UTC.
+     * This method acts as a simplified wrapper for {@link #parse(String, String, Class, ZoneId)}, with the time zone set to UTC.
      * It supports parsing strings into the same set of date types as the underlying {@code parseDate} method.
      *
      * @param <T>        The type of the desired date object.
@@ -155,16 +400,16 @@ public class DateUtils {
      * @return A parsed date object of the specified type {@code T}.
      * @throws IllegalArgumentException if the string format, pattern, or target type is invalid.
      */
-    public static <T> T parseDateWithUTC(String s, String pattern, Class<T> targetType) {
+    public static <T> T parseWithUTC(String s, String pattern, Class<T> targetType) {
         ZoneId zoneId = ZoneOffset.UTC;
-        return parseDate(s, pattern, targetType, zoneId);
+        return parse(s, pattern, targetType, zoneId);
     }
 
 
     /**
      * Parses a given string into a date object of type {@code T} using the system default time zone.
      * <p>
-     * This method acts as a simplified wrapper for {@link #parseDate(String, Class, ZoneId)},
+     * This method acts as a simplified wrapper for {@link #parse(String, Class, ZoneId)},
      * with the time zone set to the system default zone.
      * </p>
      *
@@ -174,16 +419,16 @@ public class DateUtils {
      * @return A parsed date object of the specified type {@code T}.
      * @throws IllegalArgumentException if the string format, date pattern, or target type is invalid.
      */
-    public static <T> T parseDateWithSystemZone(String s, Class<T> targetType) {
+    public static <T> T parseWithSystemZone(String s, Class<T> targetType) {
         ZoneId zoneId = ZoneId.systemDefault();
-        return parseDate(s, targetType, zoneId);
+        return parse(s, targetType, zoneId);
     }
 
 
     /**
      * Parses a given string into a date object of type {@code T} using the system default time zone and the provided date pattern.
      * <p>
-     * This method acts as a simplified wrapper for {@link #parseDate(String, String, Class, ZoneId)},
+     * This method acts as a simplified wrapper for {@link #parse(String, String, Class, ZoneId)},
      * with the time zone set to the system default zone.
      * </p>
      *
@@ -194,9 +439,9 @@ public class DateUtils {
      * @return A parsed date object of the specified type {@code T}.
      * @throws IllegalArgumentException if the string format, date pattern, or target type is invalid.
      */
-    public static <T> T parseDateWithSystemZone(String s, String pattern, Class<T> targetType) {
+    public static <T> T parseWithSystemZone(String s, String pattern, Class<T> targetType) {
         ZoneId zoneId = ZoneId.systemDefault();
-        return parseDate(s, pattern, targetType, zoneId);
+        return parse(s, pattern, targetType, zoneId);
     }
 
 
@@ -221,7 +466,7 @@ public class DateUtils {
      * @return A parsed date object of the specified type {@code T}.
      * @throws IllegalArgumentException if the timestamp or date type is invalid.
      */
-    public static <T> T parseDate(Long timestamp, Class<T> targetType, ZoneId zoneId) {
+    public static <T> T parse(Long timestamp, Class<T> targetType, ZoneId zoneId) {
         Instant instant = Instant.ofEpochMilli(timestamp);
         if (targetType == Date.class) return targetType.cast(Date.from(instant));
         if (targetType == Instant.class) return targetType.cast(instant);
@@ -245,8 +490,8 @@ public class DateUtils {
      * @return A parsed date object of the specified type {@code T}.
      * @throws IllegalArgumentException if the timestamp or date type is invalid.
      */
-    public static <T> T parseDateWithUTC(Long timestamp, Class<T> targetType) {
-        return parseDate(timestamp, targetType, ZoneOffset.UTC);
+    public static <T> T parseWithUTC(Long timestamp, Class<T> targetType) {
+        return parse(timestamp, targetType, ZoneOffset.UTC);
     }
 
 
@@ -263,8 +508,8 @@ public class DateUtils {
      * @return A parsed date object of the specified type {@code T}.
      * @throws IllegalArgumentException if the timestamp or date type is invalid.
      */
-    public static <T> T parseDateWithSystemZone(Long timestamp, Class<T> targetType) {
-        return parseDate(timestamp, targetType, ZoneId.systemDefault());
+    public static <T> T parseWithSystemZone(Long timestamp, Class<T> targetType) {
+        return parse(timestamp, targetType, ZoneId.systemDefault());
     }
 
 
