@@ -272,7 +272,7 @@ public class TypeUtils {
         if (isString(clazz)) return value;
         if (isBoolean(clazz)) return Boolean.valueOf(value);
         if (isEnum(clazz)) return Enum.valueOf((Class<Enum>) clazz, value);
-        if (isDate(clazz)) return DateUtils.parseDateWithSystemZone(value, clazz);
+        if (isDate(clazz)) return DateUtils.parseWithSystemZone(value, clazz);
         try {
             return JsonUtils.fromJson(value, clazz);
         } catch (JsonProcessingException e) {
