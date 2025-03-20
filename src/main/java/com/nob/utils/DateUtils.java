@@ -21,12 +21,14 @@ import java.util.Objects;
  * */
 public class DateUtils {
 
+
     /**
      * Prevent instantiate
      * */
     private DateUtils() {
         throw new UnsupportedOperationException("Cannot be instantiated!");
     }
+
 
     /**
      * A list of common date patterns used for date parsing and formatting.
@@ -47,26 +49,15 @@ public class DateUtils {
      */
     public static final List<String> DATE_PATTERNS = List.of(
             // With (-) separator
-            "d-M-yyyy", "yyyy-M-d",
+            "d-M-yyyy", "yyyy-M-d", "d-MMM-yyyy", "MMM-d-yyyy", "yyyy-MMM-d", "yyyy-d-MMM",
             // With (/) separator
-            "d/M/yyyy", "yyyy/M/d",
+            "d/M/yyyy", "yyyy/M/d", "d/MMM/yyyy", "MMM/d/yyyy", "yyyy/MMM/d", "yyyy/d/MMM",
             // With (.) separator
-            "d.M.yyyy", "yyyy.M.d",
+            "d.M.yyyy", "yyyy.M.d", "d.MMM.yyyy", "MMM.d.yyyy", "yyyy.MMM.d", "yyyy.d.MMM",
             // With (,) separator
-            "d,M,yyyy", "yyyy,M,d",
+            "d,M,yyyy", "yyyy,M,d", "d,MMM,yyyy", "MMM,d,yyyy", "yyyy,MMM,d", "yyyy,d,MMM",
             // With ( ) separator
-            "d M yyyy", "yyyy M d",
-
-            // Abbreviated month (MMM) - (-)
-            "d-MMM-yyyy", "MMM-d-yyyy", "yyyy-MMM-d", "yyyy-d-MMM",
-            // Abbreviated month (MMM) - (/)
-            "d/MMM/yyyy", "MMM/d/yyyy", "yyyy/MMM/d", "yyyy/d/MMM",
-            // Abbreviated month (MMM) - (.)
-            "d.MMM.yyyy", "MMM.d.yyyy", "yyyy.MMM.d", "yyyy.d.MMM",
-            // Abbreviated month (MMM) - (,)
-            "d,MMM,yyyy", "MMM,d,yyyy", "yyyy,MMM,d", "yyyy,d,MMM",
-            // Abbreviated month (MMM) - ( )
-            "d MMM yyyy", "MMM d yyyy", "yyyy MMM d", "yyyy d MMM",
+            "d M yyyy", "yyyy M d", "d MMM yyyy", "MMM d yyyy", "yyyy MMM d", "yyyy d MMM",
             // Abbreviated month (MMM) with comma - (MMM,)
             "MMM d, yyyy", "d MMM, yyyy"
     );

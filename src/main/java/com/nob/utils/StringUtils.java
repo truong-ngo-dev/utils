@@ -29,21 +29,55 @@ public class StringUtils {
 
 
     /**
-     * Check if given string is empty or not after trim()
-     * @param s the string
-     * */
-    public static boolean isTrimEmpty(String s) {
+     * This constant defines a mapping of Vietnamese accented characters to their unaccented equivalents.
+     * <p>
+     * Each entry in the array consists of:
+     * <ul>
+     *     <li>A regex pattern matching Vietnamese accented characters</li>
+     *     <li>The corresponding unaccented character</li>
+     * </ul>
+     * </p>
+     */
+    public static final String[][] VNI_ACCENTS =
+    {
+            {"à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ", "a"},
+            {"À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ", "A"},
+            {"è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ", "e"},
+            {"È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ", "E"},
+            {"ì|í|ị|ỉ|ĩ", "i"},
+            {"Ì|Í|Ị|Ỉ|Ĩ", "I"},
+            {"ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ", "o"},
+            {"Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ", "O"},
+            {"ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ", "u"},
+            {"Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ", "U"},
+            {"ỳ|ý|ỵ|ỷ|ỹ", "y"},
+            {"Ỳ|Ý|Ỵ|Ỷ|Ỹ", "Y"},
+            {"đ", "d"},
+            {"Đ", "D"}
+    };
+
+
+    /**
+     * Checks if a given string is null or empty after trimming whitespace.
+     *
+     * @param s the string to check
+     * @return {@code true} if the string is null or empty after trimming, otherwise {@code false}
+     */
+    public static boolean isTrimmedEmpty(String s) {
         return Objects.isNull(s) || s.trim().isEmpty();
     }
 
 
     /**
-     * Join the object's collection into string
-     * @param list the collection
-     * @param delimiter delimiter between element
-     * @param mapper map object of T to string
-     * @param <T> generic type of object
-     * */
+     * Joins a list of elements into a single string using a specified delimiter and a mapping function.
+     *
+     * @param <T>       the type of elements in the list
+     * @param list      the list of elements to join
+     * @param delimiter the delimiter to separate each mapped element
+     * @param mapper    a function that converts each element into a string
+     * @return a concatenated string of mapped elements separated by the delimiter,
+     *         or {@code null} if the list is null or empty
+     */
     public static <T> String join(List<T> list, String delimiter, Function<T, String> mapper) {
         if (CollectionUtils.isNullOrEmpty(list)) return null;
         return list.stream().map(mapper).collect(Collectors.joining(delimiter));
@@ -51,33 +85,39 @@ public class StringUtils {
 
 
     /**
-     * Split string into collection of object
-     * @param s the string
-     * @param delimiter delimiter between element
-     * @param mapper map string to object of T
-     * @param <T> generic type of object
-     * */
-    public static <T> List<T>  split(String s, String delimiter, Function<String, T> mapper) {
-        if (isTrimEmpty(s)) return Collections.emptyList();
+     * Splits a string into a list of elements using a specified delimiter and a mapping function.
+     *
+     * @param <T>       the type of elements in the resulting list
+     * @param s         the string to be split
+     * @param delimiter the delimiter used to separate the string
+     * @param mapper    a function that converts each split substring into an element of type {@code T}
+     * @return a list of mapped elements, or an empty list if the input string is null or empty after trimming
+     */
+    public static <T> List<T> split(String s, String delimiter, Function<String, T> mapper) {
+        if (isTrimmedEmpty(s)) return Collections.emptyList();
         return Stream.of(s.split(delimiter)).map(mapper).collect(Collectors.toList());
     }
 
 
     /**
-     * Get the non-empty value of string, if the input string is empty return value is null
-     * @param s the string
-     * */
-    public static String nonEmptyValue(String s) {
-        return isTrimEmpty(s) ? null : s;
+     * Returns the given string if it is not null or empty after trimming, otherwise returns null.
+     *
+     * @param s the input string
+     * @return the original string if it is not empty after trimming, otherwise {@code null}
+     */
+    public static String sanitizeEmptyToNull(String s) {
+        return isTrimmedEmpty(s) ? null : s;
     }
 
 
     /**
-     * Get the non-null string value
-     * @param s the string
-     * */
+     * Returns the given string if it is not null or empty after trimming, otherwise returns an empty string.
+     *
+     * @param s the input string
+     * @return the original string if it is not empty after trimming, otherwise an empty string
+     */
     public static String nvl(String s) {
-        return isTrimEmpty(s) ? "" : s;
+        return isTrimmedEmpty(s) ? "" : s;
     }
 
 
@@ -282,5 +322,52 @@ public class StringUtils {
      */
     public static boolean hasPathVariable(String template) {
         return template.matches(".*\\{[^}]+}.*");
+    }
+
+
+    /**
+     * Replaces all whitespace sequences in the given string with the specified replacement string.
+     * Trims leading and trailing whitespace before performing the replacement.
+     *
+     * @param s           the input string
+     * @param replacement the string to replace whitespace sequences with
+     * @return the modified string with whitespace replaced, or {@code null} if the input string is {@code null}
+     */
+    public static String replaceWhitespace(String s, String replacement) {
+        return s == null ? null : s.trim().replaceAll("\\s+", replacement);
+    }
+
+
+    /**
+     * Removes Vietnamese accents from the given text by replacing accented characters with their unaccented equivalents.
+     * <p>
+     * This method uses predefined regex patterns to match and replace Vietnamese characters.
+     * </p>
+     *
+     * @param text The input string that may contain Vietnamese accented characters.
+     * @return A new string with all Vietnamese accents removed. Returns {@code null} if the input is {@code null}.
+     */
+    public static String removeVNAccent(String text) {
+        if (text == null) {
+            return null;
+        }
+        String rs = null;
+        for (String[] pair : VNI_ACCENTS) {
+            rs = text.replaceAll(pair[0], pair[1]);
+        }
+        return rs;
+    }
+
+
+    /**
+     * Checks if the given string represents a false-like value.
+     * A string is considered false if it is null, empty after trimming,
+     * or equals "false", "null", or "undefined" (case-sensitive).
+     *
+     * @param s the input string
+     * @return {@code true} if the string is null, empty after trimming, or matches "false", "null", or "undefined"; otherwise {@code false}
+     */
+    public static boolean isFalsyString(String s) {
+        return isTrimmedEmpty(s) || s.equals("false") || s.equals("null") || s.equals("undefined");
     }
 }
