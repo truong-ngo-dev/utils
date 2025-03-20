@@ -119,7 +119,14 @@ public class DateUtils {
             "yyyy-MM-dd HH:mm:ss.SSS",
             "yyyy-MM-dd HH:mm:ss,SSS",
             "yyyy-MM-dd'T'HH:mm:ss",
-            "yyyy-MM-dd HH:mm:ss"
+            "yyyy-MM-dd HH:mm:ss",
+
+            // Custom format
+            "d-M-yyyy HH:mm:ss", "yyyy-M-d HH:mm:ss", "d-M-yyyy HH:mm", "yyyy-M-d HH:mm",
+            "d/M/yyyy HH:mm:ss", "yyyy/M/d HH:mm:ss", "d/M/yyyy HH:mm", "yyyy/M/d HH:mm",
+            "d.M.yyyy HH:mm:ss", "yyyy.M.d HH:mm:ss", "d.M.yyyy HH:mm", "yyyy.M.d HH:mm",
+            "d,M,yyyy HH:mm:ss", "yyyy,M,d HH:mm:ss", "d,M,yyyy HH:mm", "yyyy,M,d HH:mm",
+            "d M yyyy HH:mm:ss", "yyyy M d HH:mm:ss", "d M yyyy HH:mm", "yyyy M d HH:mm"
 
     );
 
