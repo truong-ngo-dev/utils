@@ -46,6 +46,29 @@ public class CollectionUtils {
     }
 
 
+    /**
+     * Casts an object to a {@code Map<String, Object>} if possible.
+     *
+     * <p>This method attempts to convert the given object into a {@code Map<String, Object>}.
+     * It follows these rules:
+     * <ul>
+     *     <li>If the object is {@code null}, it returns {@code null}.</li>
+     *     <li>If the object is already an instance of {@code Map}, it casts and returns it.</li>
+     *     <li>If the object is a value type (determined by {@code TypeUtils.isValueType}),
+     *         an {@code IllegalArgumentException} is thrown.</li>
+     *     <li>Otherwise, the object is converted to JSON and then deserialized back into a map.</li>
+     * </ul>
+     *
+     * <p>This approach ensures that objects with complex structures can be transformed into a map
+     * representation, which is useful in scenarios such as logging, serialization, or dynamic data handling.</p>
+     *
+     * @param o the object to be converted
+     * @return a {@code Map<String, Object>} representation of the object, or {@code null} if the input is {@code null}
+     * @throws IllegalArgumentException if the object is a value type and cannot be converted to a map
+     *
+     * @author Truong Ngo
+     * @version 1.0.0
+     */
     @SuppressWarnings("unchecked")
     public static Map<String, Object> castToMap(Object o) {
         if (o == null) return null;
