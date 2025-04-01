@@ -3,11 +3,10 @@ package com.nob.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Json utility
@@ -23,7 +22,6 @@ public class JsonUtils {
 
 
     static {
-        MAPPER.registerModule(new JavaTimeModule());
         MAPPER.findAndRegisterModules();
     }
 
@@ -79,6 +77,67 @@ public class JsonUtils {
         } catch (JsonProcessingException e) {
             log.error("Failed to stringify json object: {}", e.getMessage(), e);
             throw new IllegalArgumentException("Failed to stringify json object: " + e.getMessage(), e);
+        }
+    }
+
+
+    /**
+     * Sanitizes the given object by replacing byte arrays (`byte[]`) with a placeholder message, usually use for logging.
+     *
+     * <p>This method recursively processes the input object and:
+     * <ul>
+     *     <li>Returns {@code null} if the input is {@code null}.</li>
+     *     <li>Replaces {@code byte[]} instances with the string {@code "Binary data omitted"}.</li>
+     *     <li>Returns the original object if it is a value type (determined by {@link  TypeUtils#isValueType(Class)}).</li>
+     *     <li>Recursively processes collections by applying the same sanitization to their elements.</li>
+     *     <li>Processes maps by replacing any byte arrays found in their values.</li>
+     *     <li>If the object is neither a collection nor a map, attempts to convert it into a map
+     *         and sanitize the resulting key-value pairs.</li>
+     *     <li>If conversion to a map fails, returns the original object.</li>
+     * </ul>
+     *
+     * <p>Example usage:</p>
+     * <blockquote><pre>
+     *     byte[] data = new byte[]{1, 2, 3};
+     *     Object sanitized = sanitizeByteArray(data);
+     *     System.out.println(sanitized); // Outputs: "Binary data omitted"
+     * </pre></blockquote>
+     *
+     * @param body the object to be sanitized
+     * @return the sanitized object with binary data replaced, or the original object if no modifications are needed
+     * @throws IllegalArgumentException if an error occurs during object conversion
+     *
+     * @author Truong Ngo
+     * @version 1.0.0
+     */
+    private Object sanitizeByteArray(Object body) {
+        if (Objects.isNull(body)) return null;
+        if (body instanceof byte[]) return "Binary data omitted";
+        if (TypeUtils.isValueType(body.getClass())) return body;
+        if (TypeUtils.isCollectionType(body.getClass())) {
+            Collection<?> list = TypeUtils.getValueAsCollection(body);
+            if (Objects.isNull(list)) return null;
+            for (Object value : list) {
+                return sanitizeByteArray(value);
+            }
+        }
+        if (TypeUtils.isMapType(body.getClass())) {
+            Map<String, Object> map = CollectionUtils.castToMap(body);
+            map.replaceAll((key, value) -> {
+                if (value instanceof byte[]) return "Binary data omitted";
+                return sanitizeByteArray(value);
+            });
+        }
+        try {
+            Map<String, Object> map = MAPPER.convertValue(body, new TypeReference<>() {});
+            map.replaceAll((key, value) -> {
+                if (value instanceof byte[]) return "Binary data omitted";
+                return sanitizeByteArray(value);
+            });
+            return map;
+        } catch (IllegalArgumentException e) {
+            log.error("Error sanitizing byte array fields: {}", e.getMessage(), e);
+            return body;
         }
     }
 }

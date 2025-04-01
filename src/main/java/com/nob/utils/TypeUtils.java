@@ -484,14 +484,37 @@ public class TypeUtils {
 
 
     /**
-     * Get the element java type of collection, apply for object as other object property <p>
-     * Don't use for {@code java.util.List<Object>}, {@code java.util.List<?>}, {@code Object[]}
-     * @param clazz object type
-     * @param field reflection field represent object
-     * @return java type of element
-     * @throws IllegalArgumentException if object is not a collection type
-     * */
-    public static Class<?> getElementType(Class<?> clazz, Field field) {
+     * Gets the element type's of a collection or array. This is useful for determining the type of elements
+     * contained within collections or arrays, especially when working with reflection and generic types.
+     *
+     * <p>Note: This method should not be used for types like {@code java.util.List<Object>},
+     * {@code java.util.List<?>}, or {@code Object[]} as they are not directly applicable for type retrieval.</p>
+     *
+     * <p>The method works as follows:</p>
+     * <ul>
+     *     <li>If the given class represents an array, it returns the component type of the array.</li>
+     *     <li>If the given class represents a generic collection type, it retrieves the actual type argument
+     *         (i.e., the element type) from the field's generic type using reflection.</li>
+     * </ul>
+     *
+     * <blockquote><pre>
+     *     // Example 1: For array type
+     *     Class<?> elementType1 = getElementType(String[].class, someField);  // returns String.class
+     *
+     *     // Example 2: For List type
+     *     Class<?> elementType2 = getElementType(List.class, someField);  // returns String.class for List<String>
+     * </pre></blockquote>
+     *
+     * @param clazz the class representing the object type (collection or array)
+     * @param field the field in the object representing the collection
+     * @return the Java type of the element (component type for arrays or actual type argument for collections)
+     * @throws IllegalArgumentException if the provided object type is not a collection or array
+     * @throws NullPointerException if {@code clazz} or {@code field} is {@code null}
+     *
+     * @author Truong Ngo
+     * @version 1.0.0
+     */
+    public static Class<?> resolveCollectionElementType(Class<?> clazz, Field field) {
         if (clazz.isArray()) {
             return clazz.getComponentType();
         } else {
@@ -503,13 +526,35 @@ public class TypeUtils {
 
 
     /**
-     * Get the element type of collection parameter of method which is annotated by A
-     * @param method the method
-     * @param annotationClass annotation Class object
-     * @param <A> annotation type
-     * @return the generic type of collection parameter of method which is annotated by A
-     * */
-    public static <A extends Annotation> Class<?> getParameterGenericElementType(Method method, Class<A> annotationClass) {
+     * Retrieves the element type's of a collection parameter in a method annotated with a specific annotation.
+     *
+     * <p>This method scans the parameters of the provided {@code method} to find the one annotated with the given
+     * annotation {@code annotationClass}. If such a parameter exists and is of a collection type (e.g., {@link java.util.List},
+     * {@link java.util.Set}), it will return the generic type of the elements contained within the collection.
+     * If the parameter is an array, it will return the component type of the array.</p>
+     *
+     * <p>If no parameter is annotated with the specified annotation, or if the annotated parameter is not a collection or array,
+     * the method will return {@code null}.</p>
+     *
+     * <blockquote><pre>
+     *     // Example usage:
+     *     Method method = someObject.getClass().getMethod("someMethod", List.class);
+     *     Class<?> elementType = getParameterGenericElementType(method, SomeAnnotation.class);
+     *     // If 'someMethod' has a parameter annotated with @SomeAnnotation and is a List<String>,
+     *     // elementType will be String.class.
+     * </pre></blockquote>
+     *
+     * @param method the method whose parameters to check
+     * @param annotationClass the annotation class to search for on the method parameters
+     * @param <A> the type of the annotation
+     * @return the generic type of the collection's elements, or {@code null} if no annotated parameter is found
+     *         or the parameter is not a collection or array
+     * @throws NullPointerException if {@code method} or {@code annotationClass} is {@code null}
+     *
+     * @author Truong Ngo
+     * @version 1.0.0
+     */
+    public static <A extends Annotation> Class<?> getAnnotatedParameterElementType (Method method, Class<A> annotationClass) {
         Parameter parameter = null;
         Parameter[] parameters = method.getParameters();
         for (Parameter p : parameters) {
@@ -537,7 +582,7 @@ public class TypeUtils {
      * @return Collection type object
      * @throws IllegalArgumentException if object is not a collection type
      * */
-    public static Collection<?> getCollection(Object o) {
+    public static Collection<?> getValueAsCollection(Object o) {
         if (Objects.isNull(o)) return null;
         if (o.getClass().isArray()) {
             List<Object> rs = new ArrayList<>();
