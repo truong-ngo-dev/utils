@@ -112,7 +112,7 @@ public class JsonUtils {
      */
     private Object sanitizeByteArray(Object body) {
         if (Objects.isNull(body)) return null;
-        if (body instanceof byte[]) return "Binary data omitted";
+        if (body instanceof byte[]) return "Binary data";
         if (TypeUtils.isValueType(body.getClass())) return body;
         if (TypeUtils.isCollectionType(body.getClass())) {
             Collection<?> list = TypeUtils.getValueAsCollection(body);
@@ -124,7 +124,7 @@ public class JsonUtils {
         if (TypeUtils.isMapType(body.getClass())) {
             Map<String, Object> map = CollectionUtils.castToMap(body);
             map.replaceAll((key, value) -> {
-                if (value instanceof byte[]) return "Binary data omitted";
+                if (value instanceof byte[]) return "Binary data";
                 return sanitizeByteArray(value);
             });
         }
