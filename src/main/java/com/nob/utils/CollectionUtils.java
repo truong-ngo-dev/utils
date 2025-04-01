@@ -1,5 +1,6 @@
 package com.nob.utils;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.util.Assert;
 
 import java.lang.reflect.Array;
@@ -33,7 +34,7 @@ public class CollectionUtils {
     public static Object getElement(Object o, int index) {
         Assert.isTrue(o != null, "o must be not null");
         Assert.isTrue(index >= 0, "index must be non-negative");
-        if (TypeUtils.isCollection(o.getClass())) {
+        if (TypeUtils.isCollectionType(o.getClass())) {
             if (Collection.class.isAssignableFrom(o.getClass())) {
                 List<?> list = new ArrayList<>((Collection<?>) o);
                 return list.get(index);
@@ -42,5 +43,14 @@ public class CollectionUtils {
             }
         }
         throw new IllegalArgumentException("Object is not a collection");
+    }
+
+
+    @SuppressWarnings("unchecked")
+    public static Map<String, Object> castToMap(Object o) {
+        if (o == null) return null;
+        if (o instanceof Map) return (Map<String, Object>) o;
+        if (TypeUtils.isValueType(o.getClass())) throw new IllegalArgumentException("Unsupported type: " + o.getClass());
+        return JsonUtils.fromJson(JsonUtils.toJson(o), new TypeReference<>() {});
     }
 }

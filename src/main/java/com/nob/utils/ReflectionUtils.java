@@ -1,18 +1,10 @@
 package com.nob.utils;
 
-import lombok.Data;
-import org.springframework.expression.Expression;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
 
 public class ReflectionUtils {
-
 
     /**
      * Retrieve a field by its name, including fields from superclasses (excluding Object).
@@ -126,7 +118,7 @@ public class ReflectionUtils {
      */
     private static Object getCollectionElement(String path, int index, Object base) {
         Object value;
-        if (!TypeUtils.isCollection(base.getClass())) throw new IllegalArgumentException("Base object is not collection");
+        if (!TypeUtils.isCollectionType(base.getClass())) throw new IllegalArgumentException("Base object is not collection");
         if (Collection.class.isAssignableFrom(base.getClass())) {
             List<?> list = new ArrayList<>((Collection<?>) base);
             if (index < 0 || index >= list.size()) throw new IllegalArgumentException("Path " + path + " error");
@@ -152,87 +144,10 @@ public class ReflectionUtils {
      */
     private static Object getValueOfNonCollectionObject(Object obj, String name) {
         if (Objects.isNull(obj) || Objects.isNull(name)) throw new IllegalArgumentException("Object and name must not be null");
-        if (TypeUtils.isValueBased(obj.getClass())) throw new IllegalArgumentException("Object is value based type");
-        if (TypeUtils.isCollection(obj.getClass())) throw new IllegalArgumentException("Object is collection");
-        if (TypeUtils.isMap(obj.getClass())) return ((Map<?, ?>) obj).get(name);
+        if (TypeUtils.isStandardValueType(obj.getClass())) throw new IllegalArgumentException("Object is value based type");
+        if (TypeUtils.isCollectionType(obj.getClass())) throw new IllegalArgumentException("Object is collection");
+        if (TypeUtils.isMapType(obj.getClass())) return ((Map<?, ?>) obj).get(name);
         return getFieldValue(obj, name);
     }
-
-//    public static void main(String[] args) {
-//
-//    }
-//
-//    public static void testSpEL() {
-//        User user = prepareUser();
-//        String expr = "roles[0].scopes[0].name";
-//        Long spELStart = System.currentTimeMillis();
-//        for (int i = 0; i < 1000; i++) {
-//            ExpressionParser parser = new SpelExpressionParser();
-//            Expression expression = parser.parseExpression(expr);
-//            expression.getValue(user);
-//        }
-//        Long spELEnd = System.currentTimeMillis();
-//        long duration = spELEnd - spELStart;
-//        System.out.printf("SpEL execution time: %d, average: %s", duration, new BigDecimal(duration).divide(BigDecimal.valueOf(1000), RoundingMode.HALF_UP).longValue());
-//    }
-//
-//    public static void testUtils() {
-//        User user = prepareUser();
-//        String expr = "roles[0].scopes[0].name";
-//        Long spELStart = System.currentTimeMillis();
-//        for (int i = 0; i < 1000; i++) {
-//            getObjectValue(user, expr);
-//        }
-//        Long spELEnd = System.currentTimeMillis();
-//        long duration = spELEnd - spELStart;
-//        System.out.printf("Utils execution time: %d, average: %s", duration, new BigDecimal(duration).divide(BigDecimal.valueOf(1000), RoundingMode.HALF_UP).longValue());
-//    }
-//
-//    public static User prepareUser() {
-//        User user = new User();
-//        user.setName("John Doe");
-//        user.setAge("30");
-//
-//        List<Scope> adminScopes = new ArrayList<>();
-//        adminScopes.add(new Scope(1L, "READ"));
-//        adminScopes.add(new Scope(2L, "WRITE"));
-//
-//        Role adminRole = new Role();
-//        adminRole.setId(1L);
-//        adminRole.setName("ADMIN");
-//        adminRole.setScopes(adminScopes);
-//
-//        List<Role> roles = new ArrayList<>();
-//        roles.add(adminRole);
-//
-//        user.setRoles(roles);
-//        return user;
-//    }
-//
-//    @Data
-//    static class User {
-//        String name;
-//        String age;
-//        List<Role> roles;
-//    }
-//
-//    @Data
-//    static class Role {
-//        Long id;
-//        String name;
-//        List<Scope> scopes;
-//    }
-//
-//    @Data
-//    static class Scope {
-//        Long id;
-//        String name;
-//
-//        public Scope(Long id, String name) {
-//            this.id = id;
-//            this.name = name;
-//        }
-//    }
-
 
 }
