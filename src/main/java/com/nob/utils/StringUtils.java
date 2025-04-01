@@ -370,4 +370,35 @@ public class StringUtils {
     public static boolean isFalsyString(String s) {
         return isTrimmedEmpty(s) || s.equals("false") || s.equals("null") || s.equals("undefined");
     }
+
+
+    /**
+     * Checks whether the given string represents a single character.
+     *
+     * <p>This method returns {@code true} if the input string is not {@code null}
+     * and contains exactly one character.
+     * @param str the string to check
+     * @return {@code true} if the given string represents a single character; {@code false} otherwise
+     */
+    public static boolean isCharacter(String str) {
+        return str != null && str.length() == 1;
+    }
+
+
+    /**
+     * Converts a given string to a {@code Character}.
+     *
+     * <p>If the string is {@code null}, this method returns {@code null}.
+     * If the string contains exactly one character, it returns that character.
+     * Otherwise, an {@code IllegalArgumentException} is thrown.
+     *
+     * @param str the input string
+     * @return the corresponding {@code Character} if the string contains exactly one character, otherwise {@code null}
+     * @throws IllegalArgumentException if the string contains more than one character
+     */
+    public static Character castToChar(String str) {
+        if (str == null) return null;
+        if (isCharacter(str)) return str.charAt(0);
+        throw new IllegalArgumentException("Invalid character: " + str);
+    }
 }

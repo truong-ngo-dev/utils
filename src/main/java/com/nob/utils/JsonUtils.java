@@ -7,9 +7,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Json utility
+ * @author Truong Ngo
+ * @version 1.0.0
  * */
 public class JsonUtils {
 
@@ -100,26 +103,21 @@ public class JsonUtils {
      * <blockquote><pre>
      *     byte[] data = new byte[]{1, 2, 3};
      *     Object sanitized = sanitizeByteArray(data);
-     *     System.out.println(sanitized); // Outputs: "Binary data omitted"
+     *     System.out.println(sanitized); // Outputs: "Binary data"
      * </pre></blockquote>
      *
      * @param body the object to be sanitized
      * @return the sanitized object with binary data replaced, or the original object if no modifications are needed
      * @throws IllegalArgumentException if an error occurs during object conversion
-     *
-     * @author Truong Ngo
-     * @version 1.0.0
      */
     private Object sanitizeByteArray(Object body) {
         if (Objects.isNull(body)) return null;
         if (body instanceof byte[]) return "Binary data";
         if (TypeUtils.isValueType(body.getClass())) return body;
         if (TypeUtils.isCollectionType(body.getClass())) {
-            Collection<?> list = TypeUtils.getValueAsCollection(body);
+            Collection<?> list = CollectionUtils.castToCollection(body);
             if (Objects.isNull(list)) return null;
-            for (Object value : list) {
-                return sanitizeByteArray(value);
-            }
+            return list.stream().map(this::sanitizeByteArray).collect(Collectors.toList());
         }
         if (TypeUtils.isMapType(body.getClass())) {
             Map<String, Object> map = CollectionUtils.castToMap(body);

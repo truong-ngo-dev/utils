@@ -14,8 +14,9 @@ import java.time.temporal.Temporal;
 import java.util.*;
 
 /**
- * Utility for type
+ * Utility for data type
  * @author Truong Ngo
+ * @version 1.0.0
  * */
 public class TypeUtils {
 
@@ -29,9 +30,6 @@ public class TypeUtils {
      * @param type the class to check
      * @return {@code true} if the given class represents a primitive type; {@code false} otherwise
      * @throws NullPointerException if {@code type} is {@code null}
-     *
-     * @author Truong Ngo
-     * @version 1.0.0
      */
     public static boolean isPrimitiveType(Class<?> type) {
         return type.isPrimitive();
@@ -47,9 +45,6 @@ public class TypeUtils {
      * @param type the class to check
      * @return {@code true} if the given class is a wrapper type; {@code false} otherwise
      * @throws NullPointerException if {@code type} is {@code null}
-     *
-     * @author Truong Ngo
-     * @version 1.0.0
      */
     public static boolean isWrapperType(Class<?> type) {
         return
@@ -69,9 +64,6 @@ public class TypeUtils {
      * @param type the class to check
      * @return {@code true} if the given class represents a void type; {@code false} otherwise
      * @throws NullPointerException if {@code type} is {@code null}
-     *
-     * @author Truong Ngo
-     * @version 1.0.0
      */
     public static boolean isVoidType(Class<?> type) {
         return (type == void.class || type == Void.class);
@@ -87,9 +79,6 @@ public class TypeUtils {
      * @param clazz the class to check
      * @return {@code true} if the given class represents a primitive numeric type; {@code false} otherwise
      * @throws NullPointerException if {@code clazz} is {@code null}
-     *
-     * @author Truong Ngo
-     * @version 1.0.0
      */
     public static boolean isPrimitiveNumberType(Class<?> clazz) {
         return
@@ -108,9 +97,6 @@ public class TypeUtils {
      * @param type the class to check
      * @return {@code true} if the given class represents a wrapper numeric type; {@code false} otherwise
      * @throws NullPointerException if {@code clazz} is {@code null}
-     *
-     * @author Truong Ngo
-     * @version 1.0.0
      */
     public static boolean isWrapperNumberType(Class<?> type) {
         return
@@ -130,9 +116,6 @@ public class TypeUtils {
      * @param type the class to check
      * @return {@code true} if the given class represents a big number type; {@code false} otherwise
      * @throws NullPointerException if {@code type} is {@code null}
-     *
-     * @author Truong Ngo
-     * @version 1.0.0
      */
     public static boolean isBigNumberType(Class<?> type) {
         return (type == BigDecimal.class || type == BigInteger.class);
@@ -169,9 +152,6 @@ public class TypeUtils {
      * @param type the class to check
      * @return {@code true} if the given class represents a standard numeric type; {@code false} otherwise
      * @throws NullPointerException if {@code type} is {@code null}
-     *
-     * @author Your Name
-     * @version 1.1
      */
     public static boolean isStandardNumberType(Class<?> type) {
         return isPrimitiveNumberType(type) || isWrapperNumberType(type) || isBigNumberType(type);
@@ -183,14 +163,12 @@ public class TypeUtils {
      *
      * <p>This method returns {@code true} if the specified {@code Class} object
      * is a subclass of {@link Number}, including all numeric wrapper types,
-     * {@link BigDecimal}, {@link BigInteger}, and any custom subclasses of {@code Number} like Atomic version.</p>
+     * {@link BigDecimal}, {@link BigInteger}, and any custom subclasses of {@code Number}
+     * like {@link java.util.concurrent.atomic.AtomicInteger}, {@link java.util.concurrent.atomic.AtomicLong}...</p>
      *
      * @param type the class to check
      * @return {@code true} if the given class is a subclass of {@code Number}; {@code false} otherwise
      * @throws NullPointerException if {@code clazz} is {@code null}
-     *
-     * @author Truong Ngo
-     * @version 1.0.0
      */
     public static boolean isNumberType(Class<?> type) {
         return Number.class.isAssignableFrom(type);
@@ -207,9 +185,6 @@ public class TypeUtils {
      * @param type the class to check
      * @return {@code true} if the given class represents an integer-based numeric type; {@code false} otherwise
      * @throws NullPointerException if {@code clazz} is {@code null}
-     *
-     * @author Truong Ngo
-     * @version 1.0.0
      */
     public static boolean isIntegerNumberType(Class<?> type) {
         return
@@ -230,9 +205,6 @@ public class TypeUtils {
      * @param type the class to check
      * @return {@code true} if the given class represents a decimal-based numeric type; {@code false} otherwise
      * @throws NullPointerException if {@code clazz} is {@code null}
-     *
-     * @author Truong Ngo
-     * @version 1.0.0
      */
     public static boolean isDecimalNumberType(Class<?> type) {
         return
@@ -251,9 +223,6 @@ public class TypeUtils {
      * @param type the class to check
      * @return {@code true} if the given class represents a boolean type; {@code false} otherwise
      * @throws NullPointerException if {@code clazz} is {@code null}
-     *
-     * @author Ngo Truong
-     * @version 1.0.0
      */
     public static boolean isBooleanType(Class<?> type) {
         return type == boolean.class || type == Boolean.class;
@@ -261,20 +230,32 @@ public class TypeUtils {
 
 
     /**
-     * Checks whether the given class represents a string-like type.
+     * Checks whether the given class represents a character type.
      *
      * <p>This method returns {@code true} if the specified {@code Class} object
-     * represents a string or a character type;
+     * represents a single character.
      *
      * @param type the class to check
-     * @return {@code true} if the given class represents a string or character type; {@code false} otherwise
-     * @throws NullPointerException if {@code clazz} is {@code null}
+     * @return {@code true} if the given class represents a character type; {@code false} otherwise
+     * @throws NullPointerException if {@code type} is {@code null}
+     */
+    public static boolean isCharacterType(Class<?> type) {
+        return type == Character.class || type == char.class;
+    }
+
+
+    /**
+     * Checks whether the given class represents a string type.
      *
-     * @author Truong Ngo
-     * @version 1.0.0
+     * <p>This method returns {@code true} if the specified {@code Class} object
+     * represents a string.
+     *
+     * @param type the class to check
+     * @return {@code true} if the given class represents a string; {@code false} otherwise
+     * @throws NullPointerException if {@code type} is {@code null}
      */
     public static boolean isStringType(Class<?> type) {
-        return type == String.class || type == Character.class || type == char.class;
+        return type == String.class;
     }
 
 
@@ -295,9 +276,6 @@ public class TypeUtils {
      * @param type the class to check
      * @return {@code true} if the given class represents a standard date or time type; {@code false} otherwise
      * @throws NullPointerException if {@code clazz} is {@code null}
-     *
-     * @author Truong Ngo
-     * @version 1.0.0
      */
     public static boolean isStandardDateType(Class<?> type) {
         return
@@ -319,9 +297,6 @@ public class TypeUtils {
      * @param type the class to check
      * @return {@code true} if the given class is a subclass of {@code java.util.Date}; {@code false} otherwise
      * @throws NullPointerException if {@code type} is {@code null}
-     *
-     * @author Truong Ngo
-     * @version 1.0.0
      */
     public static boolean isLegacyDateType(Class<?> type) {
         return Date.class.isAssignableFrom(type);
@@ -347,9 +322,6 @@ public class TypeUtils {
      * @param type the class to check
      * @return {@code true} if the given class is a subclass of {@code java.time.temporal.Temporal}; {@code false} otherwise
      * @throws NullPointerException if {@code type} is {@code null}
-     *
-     * @author Truong Ngo
-     * @version 1.0.0
      */
     public static boolean isJavaTimeDateType(Class<?> type) {
         return Temporal.class.isAssignableFrom(type);
@@ -366,9 +338,6 @@ public class TypeUtils {
      * @param type the class to check
      * @return {@code true} if the given class is a legacy or Java Time date type; {@code false} otherwise
      * @throws NullPointerException if {@code type} is {@code null}
-     *
-     * @author Truong Ngo
-     * @version 1.0.0
      */
     public static boolean isDateType(Class<?> type) {
         return isLegacyDateType(type) || isJavaTimeDateType(type);
@@ -384,9 +353,6 @@ public class TypeUtils {
      * @param type the class to check
      * @return {@code true} if the given class is an enumeration type; {@code false} otherwise
      * @throws NullPointerException if {@code clazz} is {@code null}
-     *
-     * @author Your Name
-     * @version 1.0
      */
     public static boolean isEnumType(Class<?> type) {
         return type.isEnum();
@@ -411,15 +377,13 @@ public class TypeUtils {
      * @param type the class to check
      * @return {@code true} if the given class represents a standard value-based type; {@code false} otherwise
      * @throws NullPointerException if {@code clazz} is {@code null}
-     *
-     * @author Truong Ngo
-     * @version 1.0.0
      */
     public static boolean isStandardValueType(Class<?> type) {
         return
                 isVoidType(type) ||
                 isStandardNumberType(type) ||
                 isBooleanType(type) ||
+                isCharacterType(type) ||
                 isStringType(type) ||
                 isStandardDateType(type) ||
                 isEnumType(type);
@@ -436,9 +400,6 @@ public class TypeUtils {
      * @param type the class to check
      * @return {@code true} if the given class represents a simple value type; {@code false} otherwise
      * @throws NullPointerException if {@code clazz} is {@code null}
-     *
-     * @author Truong Ngo
-     * @version 1.0.0
      */
     public static boolean isValueType(Class<?> type) {
         return ClassUtils.isSimpleValueType(type);
@@ -455,9 +416,6 @@ public class TypeUtils {
      * @param clazz the class to check
      * @return {@code true} if the given class is a collection or an array; {@code false} otherwise
      * @throws NullPointerException if {@code clazz} is {@code null}
-     *
-     * @author Truong Ngo
-     * @version 1.0.0
      */
     public static boolean isCollectionType(Class<?> clazz) {
         return clazz.isArray() || Collection.class.isAssignableFrom(clazz);
@@ -474,9 +432,6 @@ public class TypeUtils {
      * @param clazz the class to check
      * @return {@code true} if the given class is a map; {@code false} otherwise
      * @throws NullPointerException if {@code clazz} is {@code null}
-     *
-     * @author Truong Ngo
-     * @version 1.0.0
      */
     public static boolean isMapType(Class<?> clazz) {
         return Map.class.isAssignableFrom(clazz);
@@ -510,9 +465,6 @@ public class TypeUtils {
      * @return the Java type of the element (component type for arrays or actual type argument for collections)
      * @throws IllegalArgumentException if the provided object type is not a collection or array
      * @throws NullPointerException if {@code clazz} or {@code field} is {@code null}
-     *
-     * @author Truong Ngo
-     * @version 1.0.0
      */
     public static Class<?> resolveCollectionElementType(Class<?> clazz, Field field) {
         if (clazz.isArray()) {
@@ -577,35 +529,49 @@ public class TypeUtils {
 
 
     /**
-     * Get collection value of object
-     * @param o object
-     * @return Collection type object
-     * @throws IllegalArgumentException if object is not a collection type
-     * */
-    public static Collection<?> getValueAsCollection(Object o) {
-        if (Objects.isNull(o)) return null;
-        if (o.getClass().isArray()) {
-            List<Object> rs = new ArrayList<>();
-            for (int i = 0; i < Array.getLength(o); i++) {
-                rs.add(Array.get(o, i));
-            }
-            return rs;
-        }
-        if (Collection.class.isAssignableFrom(o.getClass())) {
-            return new ArrayList<>((Collection<?>) o);
-        }
-        throw new IllegalArgumentException(o.getClass() + " is not a collection");
-    }
-
-
+     * Converts a given string value to the specified type.
+     *
+     * <p>This method attempts to cast the provided string to the desired target type, which is specified by
+     * the {@code clazz} parameter. The method checks several possible types, including numeric types,
+     * string types, character types, boolean types, enums, and standard date types. If the type is not
+     * recognized, it attempts to parse the value as JSON.</p>
+     *
+     * <p>Supported conversions include:</p>
+     * <ul>
+     *     <li>If the target type is a standard numeric type (e.g., {@code Integer}, {@code Double}), the
+     *         value is parsed as a number.</li>
+     *     <li>If the target type is a string, the value is returned as is.</li>
+     *     <li>If the target type is a character, the value is parsed as a single character.</li>
+     *     <li>If the target type is a boolean, the value is parsed using {@code Boolean.parseBoolean()}.</li>
+     *     <li>If the target type is an enum, the value is converted to the corresponding enum constant.</li>
+     *     <li>If the target type is a standard date type (e.g., {@code LocalDate}, {@code Date}), the value is
+     *         parsed using a date utility.</li>
+     *     <li>For unsupported types, the value is attempted to be parsed as JSON using {@code JsonUtils.fromJson()}.</li>
+     * </ul>
+     *
+     * <blockquote><pre>
+     *     cast("123", Integer.class);  // returns 123
+     *     cast("true", Boolean.class);  // returns true
+     *     cast("A", Character.class);   // returns 'A'
+     *     cast("2025-04-01", LocalDate.class);  // returns LocalDate of April 1, 2025
+     * </pre></blockquote>
+     *
+     * @param value the string value to be converted
+     * @param clazz the target class type to which the value should be converted
+     * @param <T> the type of the result
+     * @return the converted value, or {@code null} if the input string is {@code null}
+     * @throws IllegalArgumentException if the string value cannot be converted to the specified type
+     * @throws NullPointerException if the {@code clazz} is {@code null}
+     */
     @SuppressWarnings("all")
-    public static Object castValueAs(String value, Class<?> clazz) {
+    public static <T> T cast(String value, Class<T> clazz) {
         if (Objects.isNull(value)) return null;
-        if (isStandardNumberType(clazz)) return NumberUtils.toNumber(clazz, value);
-        if (isStringType(clazz)) return value;
-        if (isBooleanType(clazz)) return Boolean.valueOf(value);
-        if (isEnumType(clazz)) return Enum.valueOf((Class<Enum>) clazz, value);
-        if (isStandardDateType(clazz)) return DateUtils.parseWithSystemZone(value, clazz);
+        if (isStandardNumberType(clazz)) return clazz.cast(NumberUtils.toNumber(clazz, value));
+        if (isStringType(clazz)) return clazz.cast(value);
+        if (isCharacterType(clazz)) return clazz.cast(StringUtils.castToChar(value));
+        if (isBooleanType(clazz)) return clazz.cast(Boolean.parseBoolean(value));
+        if (isEnumType(clazz)) return clazz.cast(Enum.valueOf((Class<Enum>) clazz, value));
+        if (isStandardDateType(clazz)) return clazz.cast(DateUtils.parseWithSystemZone(value, clazz));
         return JsonUtils.fromJson(value, clazz);
     }
 }

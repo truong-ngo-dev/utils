@@ -1,16 +1,23 @@
 package com.nob.utils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import java.lang.reflect.Array;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Collection utility
  * @author Truong Ngo
  * */
 public class CollectionUtils {
+
+    private static final Logger log = LoggerFactory.getLogger(CollectionUtils.class);
 
     /**
      * Check if collection is null or empty
@@ -65,15 +72,63 @@ public class CollectionUtils {
      * @param o the object to be converted
      * @return a {@code Map<String, Object>} representation of the object, or {@code null} if the input is {@code null}
      * @throws IllegalArgumentException if the object is a value type and cannot be converted to a map
-     *
-     * @author Truong Ngo
-     * @version 1.0.0
      */
-    @SuppressWarnings("unchecked")
     public static Map<String, Object> castToMap(Object o) {
         if (o == null) return null;
-        if (o instanceof Map) return (Map<String, Object>) o;
+        if (o instanceof Map<?, ?> map) {
+            return map.entrySet().stream().collect(Collectors.toMap(
+                    Object::toString,
+                    Function.identity()));
+        };
+        if (o instanceof String s) {
+            try {
+                return JsonUtils.fromJson(s, new TypeReference<>() {});
+            } catch (IllegalArgumentException e) {
+                log.error("Invalid json map string: {}", e.getMessage(), e);
+                throw new IllegalArgumentException("Invalid json map string: '" + o + "', details: " + e.getMessage());
+            }
+        }
         if (TypeUtils.isValueType(o.getClass())) throw new IllegalArgumentException("Unsupported type: " + o.getClass());
         return JsonUtils.fromJson(JsonUtils.toJson(o), new TypeReference<>() {});
+    }
+
+
+    /**
+     * Converts the provided object to a {@link Collection}.
+     *
+     * <p>This method checks if the provided object is an array, a {@link Collection}, or a JSON string
+     * representing a collection. It performs the following operations:</p>
+     * <ul>
+     *     <li>If the object is an array, it converts it into a {@link List}.</li>
+     *     <li>If the object is already a {@link Collection}, it creates a new {@link ArrayList} containing the elements of the collection.</li>
+     *     <li>If the object is a JSON string representing a collection, it deserializes it into a {@link Collection}.</li>
+     * </ul>
+     *
+     * <p>If the object is not one of these types, an {@link IllegalArgumentException} is thrown.</p>
+     *
+     * @param o the object to be converted
+     * @return a {@link Collection} containing the elements of the array, collection, or deserialized from the JSON string
+     * @throws IllegalArgumentException if the provided object is neither an array, a collection, nor a valid JSON string representing a collection
+     * @throws NullPointerException if {@code o} is {@code null}
+     */
+    public static Collection<?> castToCollection(Object o) {
+        if (Objects.isNull(o)) return null;
+        if (o.getClass().isArray()) {
+            return IntStream.range(0, Array.getLength(o))
+                    .mapToObj(i -> Array.get(o, i))
+                    .collect(Collectors.toList());
+        }
+        if (Collection.class.isAssignableFrom(o.getClass())) {
+            return new ArrayList<>((Collection<?>) o);
+        }
+        if (o instanceof String s) {
+            try {
+                return JsonUtils.fromJson(s, new TypeReference<>() {});
+            } catch (IllegalArgumentException e) {
+                log.error("Invalid collection json string: {}", e.getMessage(), e);
+                throw new IllegalArgumentException("Invalid collection json string: '" + s + "', details: " + e.getMessage());
+            }
+        }
+        throw new IllegalArgumentException(o.getClass() + " is not a collection");
     }
 }
