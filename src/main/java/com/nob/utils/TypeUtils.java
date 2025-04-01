@@ -76,15 +76,15 @@ public class TypeUtils {
      * <p>This method returns {@code true} if the specified {@code Class} object
      * represents one of Java's primitive numeric types.
      *
-     * @param clazz the class to check
+     * @param type the class to check
      * @return {@code true} if the given class represents a primitive numeric type; {@code false} otherwise
-     * @throws NullPointerException if {@code clazz} is {@code null}
+     * @throws NullPointerException if {@code type} is {@code null}
      */
-    public static boolean isPrimitiveNumberType(Class<?> clazz) {
+    public static boolean isPrimitiveNumberType(Class<?> type) {
         return
-                clazz == byte.class || clazz == short.class ||
-                clazz == int.class || clazz == long.class ||
-                clazz == double.class || clazz == float.class;
+                type == byte.class || type == short.class ||
+                type == int.class || type == long.class ||
+                type == double.class || type == float.class;
     }
 
 
@@ -96,7 +96,7 @@ public class TypeUtils {
      *
      * @param type the class to check
      * @return {@code true} if the given class represents a wrapper numeric type; {@code false} otherwise
-     * @throws NullPointerException if {@code clazz} is {@code null}
+     * @throws NullPointerException if {@code type} is {@code null}
      */
     public static boolean isWrapperNumberType(Class<?> type) {
         return
@@ -168,7 +168,7 @@ public class TypeUtils {
      *
      * @param type the class to check
      * @return {@code true} if the given class is a subclass of {@code Number}; {@code false} otherwise
-     * @throws NullPointerException if {@code clazz} is {@code null}
+     * @throws NullPointerException if {@code type} is {@code null}
      */
     public static boolean isNumberType(Class<?> type) {
         return Number.class.isAssignableFrom(type);
@@ -360,6 +360,20 @@ public class TypeUtils {
 
 
     /**
+     * Checks if the given type is {@link Class}.
+     *
+     * <p>This method returns {@code true} if the provided {@code type} is exactly {@link Class},
+     * and {@code false} otherwise.</p>
+     *
+     * @param type the {@code Class} object to check
+     * @return {@code true} if the type is {@link Class}, {@code false} otherwise
+     */
+    public static boolean isClassType(Class<?> type) {
+        return type == Class.class;
+    }
+
+
+    /**
      * Checks whether the given class represents a standard value-based type.
      *
      * <p>A standard value-based type is a type commonly used for representing
@@ -370,7 +384,8 @@ public class TypeUtils {
      *     <li>Standard numeric types (see {@code isStandardNumberType})</li>
      *     <li>Boolean types: {@code boolean.class}, {@code Boolean.class}</li>
      *     <li>String and character types: {@code String.class}, {@code char.class}, {@code Character.class}</li>
-     *     <li>Standard date/time types (see {@code isStandardDateType})</li>
+     *     <li>Standard date/time types (see {@link #isStandardDateType(Class)})</li>
+     *     <li>Class types: {@code Class.class}</li>
      *     <li>Enumeration types</li>
      * </ul>
      *
@@ -386,7 +401,8 @@ public class TypeUtils {
                 isCharacterType(type) ||
                 isStringType(type) ||
                 isStandardDateType(type) ||
-                isEnumType(type);
+                isEnumType(type) ||
+                isClassType(type);
     }
 
 
