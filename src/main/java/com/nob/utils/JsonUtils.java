@@ -110,7 +110,7 @@ public class JsonUtils {
      * @return the sanitized object with binary data replaced, or the original object if no modifications are needed
      * @throws IllegalArgumentException if an error occurs during object conversion
      */
-    private Object sanitizeByteArray(Object body) {
+    public Object sanitizeByteArray(Object body) {
         if (Objects.isNull(body)) return null;
         if (body instanceof byte[]) return "Binary data";
         if (TypeUtils.isValueType(body.getClass())) return body;
