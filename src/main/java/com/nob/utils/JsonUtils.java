@@ -131,7 +131,7 @@ public class JsonUtils {
         try {
             Map<String, Object> map = MAPPER.convertValue(body, new TypeReference<>() {});
             map.replaceAll((key, value) -> {
-                if (value instanceof byte[]) return "Binary data omitted";
+                if (value instanceof byte[]) return "Binary data";
                 return sanitizeByteArray(value);
             });
             return map;
