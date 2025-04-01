@@ -110,14 +110,14 @@ public class JsonUtils {
      * @return the sanitized object with binary data replaced, or the original object if no modifications are needed
      * @throws IllegalArgumentException if an error occurs during object conversion
      */
-    public Object sanitizeByteArray(Object body) {
+    public static Object sanitizeByteArray(Object body) {
         if (Objects.isNull(body)) return null;
         if (body instanceof byte[]) return "Binary data";
         if (TypeUtils.isValueType(body.getClass())) return body;
         if (TypeUtils.isCollectionType(body.getClass())) {
             Collection<?> list = CollectionUtils.castToCollection(body);
             if (Objects.isNull(list)) return null;
-            return list.stream().map(this::sanitizeByteArray).collect(Collectors.toList());
+            return list.stream().map(JsonUtils::sanitizeByteArray).collect(Collectors.toList());
         }
         if (TypeUtils.isMapType(body.getClass())) {
             Map<String, Object> map = CollectionUtils.castToMap(body);
