@@ -1,4 +1,4 @@
-package com.nob.utils;
+package vn.truongngo.lib.utils;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -27,6 +27,28 @@ public class ReflectionUtils {
             }
         }
         return Optional.empty();
+    }
+
+
+    /**
+     * Retrieves all declared fields of the given class, including fields from its superclasses,
+     * excluding fields from {@code Object.class}.
+     *
+     * <p>This method iterates through the class hierarchy and collects all fields declared
+     * in each class, stopping at {@code Object.class}. This ensures that fields inherited
+     * from user-defined superclasses are included, but Java's built-in {@code Object} class fields
+     * are not.
+     * @param clazz the class whose fields should be retrieved, including those from its superclasses.
+     * @return a list of all declared fields from the given class and its superclasses, excluding {@code Object.class}.
+     */
+    public static List<Field> getAllFields(Class<?> clazz) {
+        List<Field> fields = new ArrayList<>();
+        Class<?> currentClass = clazz;
+        while (Objects.nonNull(currentClass) && !currentClass.equals(Object.class)) {
+            fields.addAll(List.of(currentClass.getDeclaredFields()));
+            currentClass = currentClass.getSuperclass();
+        }
+        return fields;
     }
 
 

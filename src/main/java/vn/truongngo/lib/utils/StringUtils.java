@@ -1,4 +1,4 @@
-package com.nob.utils;
+package vn.truongngo.lib.utils;
 
 import java.util.Collections;
 import java.util.List;

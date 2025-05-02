@@ -1,4 +1,4 @@
-package com.nob.utils;
+package vn.truongngo.lib.utils;
 
 import java.util.Map;
 import java.util.stream.Collectors;

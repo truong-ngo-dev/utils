@@ -1,4 +1,4 @@
-package com.nob.utils;
+package vn.truongngo.lib.utils;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

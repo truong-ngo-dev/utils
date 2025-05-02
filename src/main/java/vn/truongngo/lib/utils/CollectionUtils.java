@@ -1,4 +1,4 @@
-package com.nob.utils;
+package vn.truongngo.lib.utils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.slf4j.Logger;
