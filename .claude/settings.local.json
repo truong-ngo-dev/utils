@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__ide__getDiagnostics",
+      "Bash(git rm *)",
+      "Bash(mkdir -p utils-core/src/main/java/vn/truongngo/lib/utils)",
+      "Bash(mkdir -p utils-core/src/test/java/vn/truongngo/lib/utils)",
+      "Bash(mkdir -p utils-serialization/src/main/java/vn/truongngo/lib/utils)",
+      "Bash(mkdir -p utils-spring/src/main/java/vn/truongngo/lib/utils)",
+      "Bash(git mv *)",
+      "Bash(mv src/main/java/vn/truongngo/lib/utils/lang utils-core/src/main/java/vn/truongngo/lib/utils/lang)",
+      "Bash(mv src/main/java/vn/truongngo/lib/utils/reflect utils-core/src/main/java/vn/truongngo/lib/utils/reflect)",
+      "Bash(mv src/main/java/vn/truongngo/lib/utils/type utils-core/src/main/java/vn/truongngo/lib/utils/type)",
+      "Bash(mv src/test/java/vn/truongngo/lib/utils/lang utils-core/src/test/java/vn/truongngo/lib/utils/lang)",
+      "Bash(find src/main/java/vn/truongngo/lib/utils -name \"TypeUtils.java\" -o -name \"CollectionUtils.java\")",
+      "Bash(find utils-spring/src -name \"*.java\")",
+      "Bash(git restore *)",
+      "Bash(mv utils-core/src/main/java/vn/truongngo/lib/utils/lang src/main/java/vn/truongngo/lib/utils/lang)",
+      "Bash(mv utils-core/src/main/java/vn/truongngo/lib/utils/reflect src/main/java/vn/truongngo/lib/utils/reflect)",
+      "Bash(mv utils-core/src/main/java/vn/truongngo/lib/utils/type src/main/java/vn/truongngo/lib/utils/type)",
+      "Bash(mv utils-core/src/test/java/vn/truongngo/lib/utils/lang src/test/java/vn/truongngo/lib/utils/lang)",
+      "Bash(mkdir -p src/main/java/vn/truongngo/lib/utils/serialization)",
+      "Bash(mv utils-serialization/src/main/java/vn/truongngo/lib/utils/serialization/JsonUtils.java src/main/java/vn/truongngo/lib/utils/serialization/JsonUtils.java)",
+      "Bash(mv utils-serialization/src/main/java/vn/truongngo/lib/utils/IOUtils.java src/main/java/vn/truongngo/lib/utils/)",
+      "Bash(mv utils-spring/src/main/java/vn/truongngo/lib/utils/HttpUtils.java src/main/java/vn/truongngo/lib/utils/)"
+    ]
+  }
+}
